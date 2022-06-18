@@ -1,0 +1,21 @@
+.homeContainer {
+  min-height: 100vh;
+  background-color: red;
+}
+
+.card {
+  width: 60%;
+  margin: auto;
+  border: 0.5px solid black;
+}
+
+.mobCard {
+}
+
+.cardHeader {
+  background-color: lightgray;
+  border-bottom: 0.5px solid black;
+  font-size: 2rem;
+  padding: 15px 0;
+  text-align: center;
+}
