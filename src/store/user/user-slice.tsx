@@ -5,12 +5,11 @@ function initialState(): User {
   const token: string | null = sessionStorage.getItem("chat-token");
   const username: string | null = sessionStorage.getItem("username");
   const roomID: string | null = sessionStorage.getItem("room-id");
-  const status: string | null = sessionStorage.getItem("status");
   return {
     token: token,
     isAdmin: false,
     roomID: roomID,
-    isLoggedIn: status ? true : false,
+    isLoggedIn: token ? true : false,
     username: username,
   };
 }
@@ -21,8 +20,16 @@ const userSlice = createSlice({
   reducers: {
     getAccess(
       state,
-      action: PayloadAction<{ token: string; isAdmin: boolean; roomID: string }>
-    ) {},
+      action: PayloadAction<{
+        token: string;
+        isAdmin: boolean;
+        roomID: string | undefined;
+      }>
+    ) {
+      state.isAdmin = action.payload.isAdmin;
+      state.token = action.payload.token ? action.payload.token : state.token;
+      state.roomID = action.payload.roomID as string;
+    },
   },
 });
 
