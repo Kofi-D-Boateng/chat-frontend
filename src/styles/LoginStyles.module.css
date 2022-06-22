@@ -1,9 +1,8 @@
-.homeContainer {
+.loginContainer {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
     url("../assets/galaxy.jpg");
   background-repeat: no-repeat;
   background-size: cover;
-  width: 100%;
   min-height: 100vh;
   background-color: red;
 }
@@ -27,19 +26,4 @@
   padding: 15px 0;
   text-align: center;
   color: white;
-}
-
-.search {
-  margin: 20px 0;
-}
-
-.homeContainer a {
-  text-decoration: none;
-  font-size: 1.2rem;
-  color: black;
-  transition-duration: 350ms;
-}
-
-.homeContainer a:hover {
-  text-decoration: underline;
 }
