@@ -18,17 +18,44 @@ const userSlice = createSlice({
   name: "user",
   initialState: initialState(),
   reducers: {
-    getAccess(
+    setRoom(
       state,
       action: PayloadAction<{
-        token: string;
-        isAdmin: boolean;
         roomID: string | undefined;
       }>
     ) {
-      state.isAdmin = action.payload.isAdmin;
-      state.token = action.payload.token ? action.payload.token : state.token;
       state.roomID = action.payload.roomID as string;
+    },
+    login(
+      state,
+      action: PayloadAction<{
+        username: string;
+      }>
+    ) {
+      state.username = action.payload.username;
+    },
+    setUser(
+      state,
+      action: PayloadAction<{
+        username: string;
+        token: string;
+        isAdmin: boolean;
+        roomID: string;
+      }>
+    ) {
+      state.token =
+        state.token && state.token.trim().length > 0
+          ? state.token
+          : action.payload.token;
+      state.isAdmin = action.payload.isAdmin;
+      state.username =
+        state.username && state.username?.trim().length > 0
+          ? state.username
+          : action.payload.username;
+      state.roomID =
+        state.roomID && state.roomID?.trim().length > 0
+          ? state.roomID
+          : action.payload.roomID;
     },
   },
 });

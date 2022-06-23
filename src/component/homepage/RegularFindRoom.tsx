@@ -37,10 +37,8 @@ const RegularFindRoom: FC<{
   const submitHandler: (e: FormEvent) => void = (e) => {
     e.preventDefault();
     dispatch(
-      userActions.getAccess({
-        isAdmin: false,
+      userActions.setRoom({
         roomID: roomID.current?.value,
-        token: "",
       })
     );
   };

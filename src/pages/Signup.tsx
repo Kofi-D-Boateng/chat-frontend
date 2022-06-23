@@ -1,6 +1,12 @@
+import { AxiosStatic } from "axios";
 import { FC } from "react";
+import { NavigateFunction } from "react-router-dom";
 
-const Signup: FC<{}> = () => {
+const Signup: FC<{
+  nav: NavigateFunction;
+  isMobile: boolean;
+  axios: AxiosStatic;
+}> = () => {
   return <></>;
 };
 

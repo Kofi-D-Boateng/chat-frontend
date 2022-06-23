@@ -1,12 +1,27 @@
 import { Dispatch, FC, Suspense, lazy } from "react";
-import { Route, Routes, useSearchParams } from "react-router-dom";
-import { HOMEPAGE, LOGIN, SIGNUP } from "./component/UI/Constatns";
+import {
+  Navigate,
+  NavigateFunction,
+  Route,
+  Routes,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
+import {
+  HOMEPAGE,
+  LOGIN,
+  REDIRECT,
+  SEARCH,
+  SIGNUP,
+} from "./component/UI/Constatns";
 import Layout from "./component/UI/Layout/Layout";
 import { User } from "./types/types";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./store/store";
 import { Theme, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
+import LoadingSpinner from "./component/UI/LoadingSpinner";
+import Search from "./pages/Search";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -17,9 +32,10 @@ const App: FC = () => {
   const isMobile: boolean = useMediaQuery(theme.breakpoints.down("md"));
   const [params] = useSearchParams();
   const dispatch: Dispatch<any> = useDispatch();
+  const navigation: NavigateFunction = useNavigate();
 
   return (
-    <Suspense fallback={<div>.....</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <Layout>
         <Routes>
           <Route
@@ -28,9 +44,20 @@ const App: FC = () => {
               <Homepage
                 user={USER}
                 isMobile={isMobile}
-                params={params}
                 axios={axios}
                 dispatch={dispatch}
+              />
+            }
+          />
+          <Route
+            path={SEARCH}
+            element={
+              <Search
+                axios={axios}
+                dispatch={dispatch}
+                params={params}
+                nav={navigation}
+                isMobile={isMobile}
               />
             }
           />
@@ -38,7 +65,7 @@ const App: FC = () => {
             path={LOGIN}
             element={
               <Login
-                user={USER}
+                nav={navigation}
                 isMobile={isMobile}
                 params={params}
                 axios={axios}
@@ -46,7 +73,13 @@ const App: FC = () => {
               />
             }
           />
-          <Route path={SIGNUP} element={<Signup />} />
+          <Route
+            path={SIGNUP}
+            element={
+              <Signup nav={navigation} isMobile={isMobile} axios={axios} />
+            }
+          />
+          <Route path={REDIRECT} element={<Navigate replace to={HOMEPAGE} />} />
         </Routes>
       </Layout>
     </Suspense>

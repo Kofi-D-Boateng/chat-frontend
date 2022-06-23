@@ -11,14 +11,13 @@ import { Dispatch, FC, useEffect } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import LoggedInFindRoom from "../component/homepage/LoggedInFindRooom";
 import RegularFindRoom from "../component/homepage/RegularFindRoom";
-import { ROOM } from "../component/UI/Constatns";
+import { SEARCH } from "../component/UI/Constatns";
 import classes from "../styles/HomeStyles.module.css";
 import { User } from "../types/types";
 
 const Homepage: FC<{
   user: User;
   isMobile: boolean;
-  params: URLSearchParams;
   axios: AxiosStatic;
   dispatch: Dispatch<any>;
 }> = ({ user, isMobile, axios, dispatch }) => {
@@ -26,7 +25,7 @@ const Homepage: FC<{
 
   useEffect(() => {
     if ((user.roomID?.trim().length as number) > 0) {
-      nav(ROOM.substring(0, 3) + user.roomID, { replace: true });
+      nav(`${SEARCH}?room=${user.roomID as string}`, { replace: true });
     }
   }, [user.roomID, nav, axios, dispatch]);
 
