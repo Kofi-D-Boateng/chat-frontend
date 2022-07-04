@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import { AxiosStatic } from "axios";
 import { Dispatch, FC, useEffect, useState } from "react";
 import { NavigateFunction } from "react-router-dom";
@@ -55,11 +55,11 @@ const Search: FC<{
         <LoadingSpinner />
       ) : result === 200 ? (
         <Grid sx={{ margin: "auto" }} container>
-          HELLO
+          <Typography variant="h3">Joining room....</Typography>
         </Grid>
       ) : (
         <Grid sx={{ margin: "auto" }} container>
-          HELLO
+          <Typography variant="h3">Room was not found.</Typography>
         </Grid>
       )}
     </Grid>

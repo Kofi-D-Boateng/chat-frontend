@@ -6,9 +6,8 @@ import {
   TypographyTypeMap,
 } from "@mui/material";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
-import { Dispatch, FC, FormEvent, useRef } from "react";
+import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { userActions } from "../../store/user/user-slice";
 import RegularSearch from "./Regular/RegularSearch";
 
 const RegularFindRoom: FC<{
@@ -16,8 +15,13 @@ const RegularFindRoom: FC<{
   Button: ExtendButtonBase<ButtonTypeMap<{}, "button">>;
   Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
   TextField: (props: TextFieldProps) => JSX.Element;
-  dispatch: Dispatch<any>;
   nav: NavigateFunction;
+  createRoom: () => void;
+  setRoom: Dispatch<
+    SetStateAction<{
+      id: string;
+    }>
+  >;
   classes: {
     readonly [key: string]: string;
   };
@@ -29,18 +33,15 @@ const RegularFindRoom: FC<{
   TextField,
   classes,
   isMobile,
-  dispatch,
   nav,
+  createRoom,
+  setRoom,
 }) => {
   const roomID = useRef<HTMLInputElement | undefined>();
 
   const submitHandler: (e: FormEvent) => void = (e) => {
     e.preventDefault();
-    dispatch(
-      userActions.setRoom({
-        roomID: roomID.current?.value,
-      })
-    );
+    setRoom({ id: roomID.current?.value as string });
   };
 
   return (
@@ -107,6 +108,7 @@ const RegularFindRoom: FC<{
                 },
               }}
               size="small"
+              onClick={createRoom}
               fullWidth
             >
               Create Room
