@@ -1,24 +1,22 @@
 import { Button, Card, CardContent, Grid, TextField } from "@mui/material";
 import { AxiosStatic } from "axios";
 import { Dispatch, FC, FormEvent, useEffect, useRef, useState } from "react";
-import { NavigateFunction, NavLink, useNavigate } from "react-router-dom";
-import { FETCHLOGIN, ROOM } from "../component/UI/Constatns";
+import { NavigateFunction, NavLink } from "react-router-dom";
+import { FETCHLOGIN, HOMEPAGE } from "../component/UI/Constatns";
 import { userActions } from "../store/user/user-slice";
-import { User } from "../types/types";
 import LoginForm from "../component/forms/LoginForm";
 import classes from "../styles/LoginStyles.module.css";
 
 const Login: FC<{
   dispatch: Dispatch<any>;
-  user: User;
   isMobile: boolean;
   params: URLSearchParams;
   axios: AxiosStatic;
-}> = ({ axios, dispatch, isMobile, params, user }) => {
+  nav: NavigateFunction;
+}> = ({ axios, dispatch, isMobile, params, nav }) => {
   const [userPassword, setUserPassword] = useState<string>("");
   const username = useRef<HTMLInputElement | undefined>();
   const password = useRef<HTMLInputElement | undefined>();
-  const nav: NavigateFunction = useNavigate();
   const userSearchParam: string | null = params.get("username");
 
   useEffect(() => {
@@ -31,24 +29,16 @@ const Login: FC<{
         await axios
           .post(FETCHLOGIN, { username: username, password: password })
           .then((response) => {
-            dispatch(
-              userActions.getAccess({
-                token: response.data.token,
-                isAdmin: false,
-                roomID: "",
-              })
-            );
+            dispatch(userActions.login({ username: response.data.username }));
+            nav(HOMEPAGE, { replace: true });
           })
           .catch(() => {
-            nav("/", { replace: true });
+            nav(HOMEPAGE, { replace: true });
           });
       };
       fetchUser(axios, userSearchParam, userPassword);
     }
-    if ((user.roomID?.trim().length as number) > 0) {
-      nav(ROOM.substring(0, 3) + user.roomID, { replace: true });
-    }
-  }, [user.roomID, nav, axios, userPassword, userSearchParam, dispatch]);
+  }, [nav, axios, userPassword, userSearchParam, dispatch]);
 
   const submitHandler: (e: FormEvent<HTMLFormElement>) => void = (e) => {
     e.preventDefault();
