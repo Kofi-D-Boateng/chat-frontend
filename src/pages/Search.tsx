@@ -22,7 +22,7 @@ const Search: FC<{
       n: NavigateFunction
     ) => void = async (axios, room, nav) => {
       await axios
-        .get(FINDROOM, { params: { room: room } })
+        .get(FINDROOM, { params: { key: room } })
         .then((response) => {
           setResult(200);
           dispatch(
@@ -31,6 +31,7 @@ const Search: FC<{
               isAdmin: false,
               roomID: response.data.roomID,
               token: response.data.token,
+              socketID: "",
             })
           );
           setTimeout(() => {
@@ -48,7 +49,7 @@ const Search: FC<{
         });
     };
     findRoomStatus(axios, room as string, nav);
-  });
+  }, [axios, dispatch, nav, room]);
   return (
     <Grid container>
       {result === 0 ? (

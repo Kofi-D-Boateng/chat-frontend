@@ -11,6 +11,7 @@ import {
   HOMEPAGE,
   LOGIN,
   REDIRECT,
+  ROOM,
   SEARCH,
   SIGNUP,
 } from "./component/UI/Constatns";
@@ -22,6 +23,7 @@ import { Theme, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
 import Search from "./pages/Search";
+import Room from "./pages/Room";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -59,6 +61,12 @@ const App: FC = () => {
                 nav={navigation}
                 isMobile={isMobile}
               />
+            }
+          />
+          <Route
+            path={ROOM}
+            element={
+              <Room isMobile={isMobile} nav={navigation} dispatch={dispatch} />
             }
           />
           <Route

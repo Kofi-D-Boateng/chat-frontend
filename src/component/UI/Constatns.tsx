@@ -7,6 +7,8 @@ const LOGIN: string = "/login";
 const SEARCH: string = "/search";
 
 // EXTERNAL ROUTES
+const SOCKETURI: string =
+  process.env.REACT_APP_SOCKET_URI || "http://localhost:7000";
 const PORT: string = process.env.REACT_APP_SERVER_PORT || "7000";
 const API_VERSION: string = process.env.REACT_APP_API_VERSION || "api/v1";
 const FETCHLOGIN: string = `http://localhost:${PORT}/${API_VERSION}/login/authenticate-user`;
@@ -23,4 +25,5 @@ export {
   FINDROOM,
   SEARCH,
   CREATEROOM,
+  SOCKETURI,
 };

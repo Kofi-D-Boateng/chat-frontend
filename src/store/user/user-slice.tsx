@@ -11,6 +11,7 @@ function initialState(): User {
     roomID: roomID,
     isLoggedIn: token ? true : false,
     username: username,
+    socketID: "",
   };
 }
 
@@ -41,6 +42,7 @@ const userSlice = createSlice({
         token: string;
         isAdmin: boolean;
         roomID: string;
+        socketID: string;
       }>
     ) {
       state.token =
@@ -56,6 +58,10 @@ const userSlice = createSlice({
         state.roomID && state.roomID?.trim().length > 0
           ? state.roomID
           : action.payload.roomID;
+      state.socketID =
+        state.socketID.trim().length > 0
+          ? state.socketID
+          : action.payload.socketID;
     },
   },
 });
