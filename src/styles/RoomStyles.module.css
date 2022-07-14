@@ -1,0 +1,31 @@
+.screen {
+  background-color: black;
+  position: relative;
+  min-height: 100vh;
+}
+
+.video {
+  width: 350px;
+}
+
+.backgroundContainer {
+  text-align: center;
+}
+
+.paper {
+  padding: 10px;
+  border: 2px solid black;
+  margin: 20px auto;
+}
+
+.name {
+  color: white;
+}
+
+.bar {
+  background-color: #1a1a1a;
+  bottom: 0;
+  width: 100%;
+  padding: 10px 0;
+  position: absolute;
+}

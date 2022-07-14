@@ -39,7 +39,9 @@ const Homepage: FC<{
       .get(CREATEROOM)
       .then((response) => {
         dispatch(userActions.setRoom({ roomID: response.data.roomID }));
-        nav(`${ROOM}/${user.roomID}/settings`, { replace: true });
+        nav(`${ROOM.substring(0, 8)}/${response.data.roomID}/settings`, {
+          replace: true,
+        });
         setLoading(false);
       })
       .catch(() => {
