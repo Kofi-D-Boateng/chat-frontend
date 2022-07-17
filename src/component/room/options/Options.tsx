@@ -9,7 +9,7 @@ import Chat from "@mui/icons-material/Chat";
 import { IconButton, Badge, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import classes from "../../../styles/OptionsStyles.module.css";
+// import classes from "../../../styles/OptionsStyles.module.css";
 
 const Options: FC<{
   onSetVideo: () => void;
@@ -21,12 +21,13 @@ const Options: FC<{
   isMobile: boolean;
 }> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count }) => {
   const video = useSelector((state: RootState) => state.video);
+
   return (
     <>
       <IconButton
         sx={{ color: "white" }}
         children={
-          <Badge badgeContent={users.length + 1} className={classes.test}>
+          <Badge badgeContent={users.length + 1}>
             <Group fontSize="large" />
           </Badge>
         }
@@ -37,7 +38,7 @@ const Options: FC<{
           value="mute"
           onClick={onSetAudio}
         >
-          <Mic fontSize="large" className={classes.micIcon} />
+          <Mic fontSize="large" />
         </IconButton>
       ) : (
         <IconButton
@@ -45,7 +46,7 @@ const Options: FC<{
           value="unmute"
           onClick={onSetAudio}
         >
-          <MicOff fontSize="large" className={classes.micIcon} />
+          <MicOff fontSize="large" />
         </IconButton>
       )}
       {video.isPlaying ? (
@@ -53,16 +54,14 @@ const Options: FC<{
           sx={{ color: "white", margin: "0 10px" }}
           value="pause"
           onClick={onSetVideo}
-          className={classes.vizIcon}
           size="small"
-          children={<Pause fontSize="large" className={classes.pause} />}
+          children={<Pause fontSize="large" />}
         />
       ) : (
         <IconButton
           sx={{ color: "white", margin: "0 10px" }}
           value="play"
           onClick={onSetVideo}
-          className={classes.vizIcon}
           size="small"
           children={<Play fontSize="large" />}
         />

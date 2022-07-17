@@ -13,6 +13,7 @@ import {
   REDIRECT,
   ROOM,
   SEARCH,
+  SETUPROOM,
   SIGNUP,
 } from "./component/UI/Constatns";
 import Layout from "./component/UI/Layout/Layout";
@@ -22,8 +23,9 @@ import { RootState } from "./store/store";
 import { Theme, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
-import Search from "./pages/Search";
+import Search from "./pages/subpages/Search";
 import Room from "./pages/Room";
+import CreateRoom from "./pages/subpages/CreateRoom";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -48,6 +50,7 @@ const App: FC = () => {
                 isMobile={isMobile}
                 axios={axios}
                 dispatch={dispatch}
+                param={params}
               />
             }
           />
@@ -66,9 +69,15 @@ const App: FC = () => {
           <Route
             path={ROOM}
             element={
-              <Room isMobile={isMobile} nav={navigation} dispatch={dispatch} />
+              <Room
+                isMobile={isMobile}
+                nav={navigation}
+                dispatch={dispatch}
+                param={params}
+              />
             }
           />
+          <Route path={SETUPROOM} element={<CreateRoom />} />
           <Route
             path={LOGIN}
             element={

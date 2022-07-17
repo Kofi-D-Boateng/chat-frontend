@@ -2,9 +2,9 @@ import { Grid, Typography } from "@mui/material";
 import { AxiosStatic } from "axios";
 import { Dispatch, FC, useEffect, useState } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { FINDROOM, REDIRECT, ROOM } from "../component/UI/Constatns";
-import LoadingSpinner from "../component/UI/LoadingSpinner";
-import { userActions } from "../store/user/user-slice";
+import { FINDROOM, REDIRECT, ROOM } from "../../component/UI/Constatns";
+import LoadingSpinner from "../../component/UI/LoadingSpinner";
+import { userActions } from "../../store/user/user-slice";
 
 const Search: FC<{
   axios: AxiosStatic;

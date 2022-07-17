@@ -8,6 +8,7 @@ import {
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
 import { NavigateFunction } from "react-router-dom";
+import { SETUPROOM } from "../UI/Constatns";
 import RegularSearch from "./Regular/RegularSearch";
 
 const RegularFindRoom: FC<{
@@ -16,7 +17,6 @@ const RegularFindRoom: FC<{
   Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
   TextField: (props: TextFieldProps) => JSX.Element;
   nav: NavigateFunction;
-  createRoom: () => void;
   setRoom: Dispatch<
     SetStateAction<{
       id: string;
@@ -34,7 +34,6 @@ const RegularFindRoom: FC<{
   classes,
   isMobile,
   nav,
-  createRoom,
   setRoom,
 }) => {
   const roomID = useRef<HTMLInputElement | undefined>();
@@ -108,7 +107,11 @@ const RegularFindRoom: FC<{
                 },
               }}
               size="small"
-              onClick={createRoom}
+              onClick={() =>
+                nav(SETUPROOM.substring(0, 13) + "?loggedIn=false", {
+                  replace: true,
+                })
+              }
               fullWidth
             >
               Create Room

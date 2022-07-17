@@ -17,16 +17,35 @@ import { RootState } from "../store/store";
 import { userActions } from "../store/user/user-slice";
 import { Messages, Participants, Peers } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
-import Options from "../component/room/options/Options";
 import { videoActions } from "../store/video/video-slice";
-import { SOCKETURI } from "../component/UI/Constatns";
-import ChatBox from "../component/room/chatbox/ChatBox";
+import {
+  CHAT,
+  DISCONNECT,
+  GETUSERSINROOM,
+  HOMEPAGE,
+  JOINROOM,
+  MESSAGES,
+  RECEIVESIGNAL,
+  ROOMSTATUS,
+  SOCKETURI,
+  USERID,
+  USERJOINED,
+  USERSLEFTINROOM,
+} from "../component/UI/Constatns";
+import {
+  addPeer,
+  createPeer,
+  _LEAVE,
+} from "../component/room/functions/room-functions";
 const Video = lazy(() => import("../component/room/screen/Video"));
+const Options = lazy(() => import("../component/room/options/Options"));
+const Chatbox = lazy(() => import("../component/room/chatbox/ChatBox"));
 
 const Room: FC<{
   isMobile: boolean;
   nav: NavigateFunction;
   dispatch: Dispatch<any>;
+  param: URLSearchParams;
 }> = ({ isMobile, nav, dispatch }) => {
   const user = useSelector((state: RootState) => state.user);
   const [hideText, setHideText] = useState(false);
@@ -43,17 +62,17 @@ const Room: FC<{
       .getUserMedia({ video: true, audio: true })
       .then((stream: MediaStream) => {
         userVideo.current.srcObject = stream;
-        socket.current?.emit("join-room", {
+        socket.current?.emit(JOINROOM, {
           room: user.roomID,
           username: user.username,
         });
-        socket.current?.on("room-status", (data: { msg: string }) => {
+        socket.current?.on(ROOMSTATUS, (data: { msg: string }) => {
           if (data.msg.includes("full")) {
-            nav("", { replace: true });
+            nav(HOMEPAGE, { replace: true });
             return;
           }
         });
-        socket.current?.on("myID", (data: { ID: string }) => {
+        socket.current?.on(USERID, (data: { ID: string }) => {
           dispatch(
             userActions.setUser({
               isAdmin: user.isAdmin,
@@ -68,16 +87,19 @@ const Room: FC<{
             { alias: user.username as string, roomID: user.roomID as string },
           ]);
         });
-        socket.current?.on("all-users", (data: { users: {}[] }) => {
+        socket.current?.on(GETUSERSINROOM, (data: { users: {}[] }) => {
           // CREATE CLASS BASED OFF OF HOW WE STORE DATA IN THE BACKEND;
           const { users } = data;
           const peers: Peer.Instance[] = [];
           users.forEach((userID) => {
-            const peer = createPeer({
-              user: "",
-              myID: user.socketID as string,
-              stream: stream,
-            });
+            const peer = createPeer(
+              {
+                user: "",
+                myID: user.socketID as string,
+                stream: stream,
+              },
+              socket
+            );
             peersRef.current.push({ peerID: "", instance: peer });
             peers.push(peer);
             return true;
@@ -85,13 +107,16 @@ const Room: FC<{
           setPeers(peers);
         });
         socket.current?.on(
-          "user-joined",
+          USERJOINED,
           (data: { signal: string | Peer.SignalData; ID: string }) => {
-            const peer = addPeer({
-              signal: data.signal,
-              ID: data.ID,
-              stream: stream,
-            });
+            const peer = addPeer(
+              {
+                signal: data.signal,
+                ID: data.ID,
+                stream: stream,
+              },
+              socket
+            );
             peersRef.current.push({
               peerID: data.ID,
               instance: peer,
@@ -100,7 +125,7 @@ const Room: FC<{
           }
         );
         socket.current?.on(
-          "receiving-signal",
+          RECEIVESIGNAL,
           (data: { id: string; signal: string | Peer.SignalData }) => {
             const item = peersRef.current.filter((p) => {
               return p.peerID === data.id;
@@ -110,7 +135,7 @@ const Room: FC<{
           }
         );
       });
-    socket.current.on("chat", async (data: { message: string; id: string }) => {
+    socket.current.on(CHAT, async (data: { message: string; id: string }) => {
       const { message, id } = data;
       const timestamp = new Date().toLocaleTimeString();
       setMessages((prev) => [
@@ -123,9 +148,9 @@ const Room: FC<{
         },
       ]);
     });
-    socket.current.on("users-left", async (data: { leaver: string }) => {
+    socket.current.on(USERSLEFTINROOM, async (data: { leaver: string }) => {
       const { leaver } = data;
-      const REMAINERS = _LEAVE(leaver);
+      const REMAINERS = _LEAVE(leaver, peersRef);
       if (REMAINERS.length === 0) {
         peersRef.current = [];
         setPeers([]);
@@ -141,70 +166,13 @@ const Room: FC<{
     });
   });
 
-  const createPeer: (data: {
-    stream: MediaStream;
-    user: string;
-    myID: string;
-  }) => Peer.Instance = (data: {
-    stream: MediaStream;
-    user: string;
-    myID: string;
-  }) => {
-    const peer = new Peer({
-      initiator: true,
-      trickle: false,
-      stream: data.stream,
-    });
-
-    peer.on("signal", (signal) => {
-      socket.current?.emit("sending-signal", {
-        userToSignal: data.user,
-        callerID: data.myID,
-        signal,
-      });
-    });
-
-    return peer;
-  };
-
-  const addPeer: (data: {
-    stream: MediaStream;
-    signal: string | Peer.SignalData;
-    ID: string;
-  }) => Peer.Instance = (data) => {
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: data.stream,
-    });
-
-    peer.on("signal", (signal) => {
-      socket.current?.emit("returning-signal", {
-        signal: signal,
-        callerID: data.ID,
-      });
-    });
-    peer.signal(data.signal);
-
-    return peer;
-  };
-
   const chatHandler: (data: { msg: string }) => void = async (data: {
     msg: string;
   }) => {
     const { msg } = data;
     if (msg !== null) {
-      socket.current?.emit("message", { message: msg });
+      socket.current?.emit(MESSAGES, { message: msg });
     }
-  };
-
-  const _LEAVE: (leaver: string) => Peers[] = (leaver: string) => {
-    console.log(leaver);
-    let remainers = peersRef.current.filter((p) => {
-      return p.peerID !== leaver;
-    });
-    console.log(remainers);
-    return remainers;
   };
 
   const viewHandler: () => void = async () => {
@@ -224,8 +192,8 @@ const Room: FC<{
     const { value } = e.currentTarget;
     if (value.trim() === "Leave") {
       //   dispatch(authActions.logout());
-      socket.current?.emit("disconnect", { room: user.socketID });
-      nav("/", { replace: true });
+      socket.current?.emit(DISCONNECT, { room: user.socketID });
+      nav(HOMEPAGE, { replace: true });
     }
   };
 
@@ -312,7 +280,7 @@ const Room: FC<{
           </Grid>
         </Grid>
       </Grid>
-      <ChatBox
+      <Chatbox
         isMobile={isMobile}
         Me={user.username}
         msgs={messages}

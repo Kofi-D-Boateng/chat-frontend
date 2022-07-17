@@ -2,7 +2,7 @@ import { Button, Card, CardContent, Grid, TextField } from "@mui/material";
 import { AxiosStatic } from "axios";
 import { Dispatch, FC, FormEvent, useEffect, useRef, useState } from "react";
 import { NavigateFunction, NavLink } from "react-router-dom";
-import { FETCHLOGIN, HOMEPAGE } from "../component/UI/Constatns";
+import { FETCHLOGIN, HOMEPAGE, LOGGEDIN } from "../component/UI/Constatns";
 import { userActions } from "../store/user/user-slice";
 import LoginForm from "../component/forms/LoginForm";
 import classes from "../styles/LoginStyles.module.css";
@@ -30,7 +30,7 @@ const Login: FC<{
           .post(FETCHLOGIN, { username: username, password: password })
           .then((response) => {
             dispatch(userActions.login({ username: response.data.username }));
-            nav(HOMEPAGE, { replace: true });
+            nav(LOGGEDIN, { replace: true });
           })
           .catch(() => {
             nav(HOMEPAGE, { replace: true });

@@ -2,7 +2,7 @@ import { Theme, useMediaQuery, useTheme } from "@mui/material";
 import { render, screen } from "@testing-library/react";
 import { Dispatch } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, useSearchParams } from "react-router-dom";
 import Homepage from "../pages/Homepage";
 import { RootState, STORE } from "../store/store";
 import { User } from "../types/types";
@@ -15,6 +15,7 @@ const dispatch: Dispatch<any> = useDispatch();
 
 describe("Homepage", () => {
   test("Homepage renders", async () => {
+    const [param] = useSearchParams();
     render(
       <Provider store={STORE}>
         <BrowserRouter>
@@ -23,6 +24,7 @@ describe("Homepage", () => {
             isMobile={isMobile}
             axios={axios}
             dispatch={dispatch}
+            param={param}
           />
         </BrowserRouter>
       </Provider>
