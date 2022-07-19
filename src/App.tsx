@@ -23,12 +23,12 @@ import { RootState } from "./store/store";
 import { Theme, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
-import Search from "./pages/subpages/Search";
-import Room from "./pages/Room";
-import CreateRoom from "./pages/subpages/CreateRoom";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
+const Room = lazy(() => import("./pages/Room"));
+const Search = lazy(() => import("./pages/subpages/Search"));
+const CreateRoom = lazy(() => import("./pages/subpages/CreateRoom"));
 
 const App: FC = () => {
   const USER: User = useSelector((state: RootState) => state.user);
@@ -77,7 +77,18 @@ const App: FC = () => {
               />
             }
           />
-          <Route path={SETUPROOM} element={<CreateRoom />} />
+          <Route
+            path={SETUPROOM}
+            element={
+              <CreateRoom
+                params={params}
+                axios={axios}
+                nav={navigation}
+                isMobile={isMobile}
+                user={USER}
+              />
+            }
+          />
           <Route
             path={LOGIN}
             element={

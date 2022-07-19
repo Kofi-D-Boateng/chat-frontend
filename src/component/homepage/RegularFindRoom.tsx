@@ -8,8 +8,8 @@ import {
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { SETUPROOM } from "../UI/Constatns";
-import RegularSearch from "./Regular/RegularSearch";
+import { LOGIN, SETUPROOM } from "../UI/Constatns";
+import RegularSearch from "../forms/search/RegularSearch";
 
 const RegularFindRoom: FC<{
   Grid: OverridableComponent<GridTypeMap<{}, "div">>;
@@ -83,7 +83,7 @@ const RegularFindRoom: FC<{
                 },
               }}
               size="small"
-              onClick={() => nav("/login", { replace: true })}
+              onClick={() => nav(LOGIN, { replace: true })}
               fullWidth
             >
               Login

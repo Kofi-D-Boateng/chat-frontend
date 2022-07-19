@@ -4,7 +4,7 @@ import { Dispatch, FC, FormEvent, useEffect, useRef, useState } from "react";
 import { NavigateFunction, NavLink } from "react-router-dom";
 import { FETCHLOGIN, HOMEPAGE, LOGGEDIN } from "../component/UI/Constatns";
 import { userActions } from "../store/user/user-slice";
-import LoginForm from "../component/forms/LoginForm";
+import LoginForm from "../component/forms/login/LoginForm";
 import classes from "../styles/LoginStyles.module.css";
 
 const Login: FC<{

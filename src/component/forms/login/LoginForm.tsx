@@ -13,7 +13,7 @@ import {
   RefAttributes,
 } from "react";
 import { NavLinkProps } from "react-router-dom";
-import { SIGNUP } from "../UI/Constatns";
+import { SIGNUP } from "../../UI/Constatns";
 
 const LoginForm: FC<{
   Submit: (e: FormEvent<HTMLFormElement>) => void;

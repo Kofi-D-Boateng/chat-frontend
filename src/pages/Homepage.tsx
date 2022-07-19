@@ -1,3 +1,6 @@
+import { Dispatch, FC, useEffect, useState } from "react";
+import { NavigateFunction, useNavigate } from "react-router-dom";
+import { AxiosStatic } from "axios";
 import {
   Card,
   CardContent,
@@ -6,14 +9,11 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { AxiosStatic } from "axios";
-import { Dispatch, FC, useEffect, useState } from "react";
-import { NavigateFunction, useNavigate } from "react-router-dom";
-import LoggedInFindRoom from "../component/homepage/LoggedInFindRooom";
-import RegularFindRoom from "../component/homepage/RegularFindRoom";
 import { SEARCH } from "../component/UI/Constatns";
 import classes from "../styles/HomeStyles.module.css";
 import { User } from "../types/types";
+import RegularFindRoom from "../component/homepage/RegularFindRoom";
+import LoggedInFindRoom from "../component/homepage/LoggedInFindRooom";
 
 const Homepage: FC<{
   user: User;
@@ -38,7 +38,7 @@ const Homepage: FC<{
         <>
           <div className={classes.cardHeader}>
             <p>
-              {!user.isLoggedIn
+              {!isLoggedIn || !user.isLoggedIn
                 ? "Welcome to Hangout!"
                 : `Welcome back ${user.username}`}
             </p>
@@ -56,7 +56,14 @@ const Homepage: FC<{
                 setRoom={setRoom}
               />
             ) : (
-              <LoggedInFindRoom Button={Button} />
+              <LoggedInFindRoom
+                Button={Button}
+                Grid={Grid}
+                Typography={Typography}
+                TextField={TextField}
+                nav={nav}
+                setRoom={setRoom}
+              />
             )}
           </CardContent>
         </>
