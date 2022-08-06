@@ -14,7 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Messages, Peers } from "../../../types/types";
+import { MessageDatagram, Messages, Peers } from "../../../types/types";
 import classes from "../../../styles/ChatStyles.module.css";
 import Message from "./messages/Message";
 
@@ -24,7 +24,7 @@ const ChatBox: FC<{
   msgs: Messages[];
   peers: MutableRefObject<Peers[]>;
   hideText: boolean;
-  onSend: (data: { msg: string }) => void;
+  onSend: (data: MessageDatagram) => void;
   Grid: OverridableComponent<GridTypeMap<{}, "div">>;
   Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
   Button: ExtendButtonBase<ButtonTypeMap<{}, "button">>;
@@ -88,7 +88,7 @@ const ChatBox: FC<{
       return;
     }
 
-    onSend({ msg: text });
+    onSend({ room: "", user: { id: "", msg: text } });
     setShowLabel(false);
     setLimit(250);
     chatRef.current!.value = "";

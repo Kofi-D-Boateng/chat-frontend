@@ -82,6 +82,7 @@ const App: FC = () => {
             element={
               <CreateRoom
                 params={params}
+                dispatch={dispatch}
                 axios={axios}
                 nav={navigation}
                 isMobile={isMobile}

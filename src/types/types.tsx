@@ -7,6 +7,7 @@ export type User = {
   isLoggedIn: boolean;
   username: string | null;
   socketID: string;
+  position: number;
 };
 
 export type Video = {
@@ -25,7 +26,7 @@ export type Participants = {
   roomID: string;
 };
 
-export type userDatagram = {
+export type UserDatagram = {
   username: string;
   socketID: string;
 };
@@ -35,4 +36,18 @@ export type Messages = {
   message: string;
   timestamp: string;
   sender: string;
+};
+
+export type CreatedRoom = {
+  name: string;
+  creator: string;
+  capacity: number;
+};
+
+export type MessageDatagram = {
+  room: string;
+  user: {
+    id: string;
+    msg: string;
+  };
 };

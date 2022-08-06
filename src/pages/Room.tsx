@@ -15,7 +15,7 @@ import { connect, Socket } from "socket.io-client";
 import Peer from "simple-peer";
 import { RootState } from "../store/store";
 import { userActions } from "../store/user/user-slice";
-import { Messages, Participants, Peers } from "../types/types";
+import { MessageDatagram, Messages, Participants, Peers } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
 import {
@@ -47,7 +47,7 @@ const Room: FC<{
   dispatch: Dispatch<any>;
   param: URLSearchParams;
 }> = ({ isMobile, nav, dispatch }) => {
-  const user = useSelector((state: RootState) => state.user);
+  const myInfo = useSelector((state: RootState) => state.user);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Peer.Instance[]>([]);
   const [messages, setMessages] = useState<Messages[]>([]);
@@ -58,13 +58,32 @@ const Room: FC<{
 
   useEffect(() => {
     socket.current = connect(SOCKETURI);
+    socket.current?.on(USERID, (ID: string) => {
+      dispatch(
+        userActions.setUser({
+          isAdmin: myInfo.isAdmin,
+          roomID: myInfo.roomID as string,
+          socketID: ID,
+          token: myInfo.token as string,
+          username: myInfo.username as string,
+        })
+      );
+      setUsers((prevState) => [
+        ...prevState,
+        {
+          alias: myInfo.username as string,
+          roomID: myInfo.roomID as string,
+        },
+      ]);
+    });
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream: MediaStream) => {
         userVideo.current.srcObject = stream;
         socket.current?.emit(JOINROOM, {
-          room: user.roomID,
-          username: user.username,
+          roomID: myInfo.roomID,
+          username: myInfo.username,
+          id: myInfo.socketID,
         });
         socket.current?.on(ROOMSTATUS, (data: { msg: string }) => {
           if (data.msg.includes("full")) {
@@ -72,40 +91,36 @@ const Room: FC<{
             return;
           }
         });
-        socket.current?.on(USERID, (data: { ID: string }) => {
-          dispatch(
-            userActions.setUser({
-              isAdmin: user.isAdmin,
-              roomID: user.roomID as string,
-              socketID: data.ID,
-              token: user.token as string,
-              username: user.username as string,
-            })
-          );
-          setUsers((prevState) => [
-            ...prevState,
-            { alias: user.username as string, roomID: user.roomID as string },
-          ]);
-        });
-        socket.current?.on(GETUSERSINROOM, (data: { users: {}[] }) => {
-          // CREATE CLASS BASED OFF OF HOW WE STORE DATA IN THE BACKEND;
-          const { users } = data;
-          const peers: Peer.Instance[] = [];
-          users.forEach((userID) => {
-            const peer = createPeer(
-              {
-                user: "",
-                myID: user.socketID as string,
-                stream: stream,
-              },
-              socket
-            );
-            peersRef.current.push({ peerID: "", instance: peer });
-            peers.push(peer);
-            return true;
-          });
-          setPeers(peers);
-        });
+        socket.current?.on(
+          GETUSERSINROOM,
+          (data: {
+            users: { id: string; position: number; username: string }[];
+          }) => {
+            // CREATE CLASS BASED OFF OF HOW WE STORE DATA IN THE BACKEND;
+            const Self = data.users.filter((User) => {
+              return User.id === myInfo.socketID;
+            });
+            dispatch(userActions.setPosition({ position: Self[0].position }));
+            const usersInRoom = data.users.filter((User) => {
+              return User.id != myInfo.socketID;
+            });
+            const peers: Peer.Instance[] = [];
+            usersInRoom.forEach((user) => {
+              const peer = createPeer(
+                {
+                  user: user.id,
+                  myID: myInfo.socketID,
+                  stream: stream,
+                },
+                socket
+              );
+              peersRef.current.push({ peerID: user.id, instance: peer });
+              peers.push(peer);
+              return true;
+            });
+            setPeers(peers);
+          }
+        );
         socket.current?.on(
           USERJOINED,
           (data: { signal: string | Peer.SignalData; ID: string }) => {
@@ -144,7 +159,7 @@ const Room: FC<{
           id: id,
           message: message,
           timestamp: timestamp,
-          sender: user.username as string,
+          sender: myInfo.username as string,
         },
       ]);
     });
@@ -166,12 +181,13 @@ const Room: FC<{
     });
   });
 
-  const chatHandler: (data: { msg: string }) => void = async (data: {
-    msg: string;
-  }) => {
-    const { msg } = data;
-    if (msg !== null) {
-      socket.current?.emit(MESSAGES, { message: msg });
+  const chatHandler: (data: MessageDatagram) => void = async (
+    data: MessageDatagram
+  ) => {
+    data.room = myInfo.roomID as string;
+    data.user.id = myInfo.socketID as string;
+    if (data.user.msg !== null) {
+      socket.current?.emit(MESSAGES, data);
     }
   };
 
@@ -192,7 +208,7 @@ const Room: FC<{
     const { value } = e.currentTarget;
     if (value.trim() === "Leave") {
       //   dispatch(authActions.logout());
-      socket.current?.emit(DISCONNECT, { room: user.socketID });
+      socket.current?.emit(DISCONNECT, { room: myInfo.socketID });
       nav(HOMEPAGE, { replace: true });
     }
   };
@@ -239,7 +255,7 @@ const Room: FC<{
           <Paper className={classes.paper} sx={{ backgroundColor: "black" }}>
             <Grid xs={12} md={12} item>
               <Typography variant="h5" className={classes.name} gutterBottom>
-                {user.username}
+                {myInfo.username}
               </Typography>
               <Grid className={classes.disabled} xs={12} md={12} item />
               <video
@@ -257,7 +273,7 @@ const Room: FC<{
                 classes={classes}
                 key={index}
                 users={users}
-                myUsername={user.username as string}
+                myUsername={myInfo.username as string}
                 peer={peer}
                 Paper={Paper}
                 Grid={Grid}
@@ -282,7 +298,7 @@ const Room: FC<{
       </Grid>
       <Chatbox
         isMobile={isMobile}
-        Me={user.username}
+        Me={myInfo.username}
         msgs={messages}
         peers={peersRef}
         onSend={chatHandler}

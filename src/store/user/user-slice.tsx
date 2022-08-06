@@ -12,6 +12,7 @@ function initialState(): User {
     isLoggedIn: token ? true : false,
     username: username,
     socketID: "",
+    position: 0,
   };
 }
 
@@ -62,6 +63,9 @@ const userSlice = createSlice({
         state.socketID.trim().length > 0
           ? state.socketID
           : action.payload.socketID;
+    },
+    setPosition(state, action: PayloadAction<{ position: number }>) {
+      state.position = action.payload.position;
     },
   },
 });

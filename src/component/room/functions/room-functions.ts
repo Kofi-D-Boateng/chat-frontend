@@ -59,7 +59,7 @@ export const createPeer: (
   peer.on(SIGNAL, (signal) => {
     socket.current?.emit(SENDINGSIGNAL, {
       userToSignal: data.user,
-      callerID: data.myID,
+      myID: data.myID,
       signal,
     });
   });
@@ -91,7 +91,7 @@ export const addPeer: (
   peer.on(SIGNAL, (signal) => {
     socket.current?.emit(RETURNINGSIGNAL, {
       signal: signal,
-      callerID: data.ID,
+      socketID: data.ID,
     });
   });
   peer.signal(data.signal);
