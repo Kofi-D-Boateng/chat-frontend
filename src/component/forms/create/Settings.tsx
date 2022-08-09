@@ -1,6 +1,6 @@
 import { ButtonTypeMap, ExtendButtonBase, TextFieldProps } from "@mui/material";
-import { Dispatch, FC, FormEvent, useRef } from "react";
-import { CreatedRoom, User } from "../../../types/types";
+import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
+import { Room, User } from "../../../types/types";
 
 const Settings: FC<{
   isLoggedIn: boolean;
@@ -10,8 +10,8 @@ const Settings: FC<{
   classes: {
     readonly [key: string]: string;
   };
-  setRoom: Dispatch<React.SetStateAction<CreatedRoom>>;
-}> = ({ Button, TextField, user, classes, setRoom, isLoggedIn }) => {
+  setRoom: Dispatch<SetStateAction<Room>>;
+}> = ({ Button, TextField, user, classes, isLoggedIn, setRoom }) => {
   const roomNameRef = useRef<HTMLInputElement | undefined>();
   const usernameRef = useRef<HTMLInputElement | undefined>();
   const capacityRef = useRef<HTMLInputElement | undefined>();
@@ -22,6 +22,7 @@ const Settings: FC<{
     console.log(capacityRef.current?.value);
     const numberCheck = parseInt(capacityRef.current?.value as string);
     if (!roomNameRef.current?.value || !usernameRef.current?.value) return;
+
     setRoom({
       name: roomNameRef.current?.value as string,
       creator: usernameRef.current?.value as string,

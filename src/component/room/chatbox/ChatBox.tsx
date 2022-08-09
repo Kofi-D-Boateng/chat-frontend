@@ -88,7 +88,10 @@ const ChatBox: FC<{
       return;
     }
 
-    onSend({ room: "", user: { id: "", msg: text } });
+    onSend({
+      room: "",
+      user: { position: 0, username: Me as string, msg: text },
+    });
     setShowLabel(false);
     setLimit(250);
     chatRef.current!.value = "";

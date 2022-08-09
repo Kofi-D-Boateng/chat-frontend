@@ -32,6 +32,7 @@ const Search: FC<{
               roomID: response.data.roomID,
               token: response.data.token,
               socketID: "",
+              position: 0,
             })
           );
           setTimeout(() => {

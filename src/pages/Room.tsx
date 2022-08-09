@@ -20,7 +20,7 @@ import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
 import {
   CHAT,
-  DISCONNECT,
+  LEAVE,
   GETUSERSINROOM,
   HOMEPAGE,
   JOINROOM,
@@ -48,6 +48,7 @@ const Room: FC<{
   param: URLSearchParams;
 }> = ({ isMobile, nav, dispatch }) => {
   const myInfo = useSelector((state: RootState) => state.user);
+  const roomInfo = useSelector((state: RootState) => state.room);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Peer.Instance[]>([]);
   const [messages, setMessages] = useState<Messages[]>([]);
@@ -55,17 +56,19 @@ const Room: FC<{
   const socket = useRef<Socket<any, any>>();
   const userVideo: ForwardedRef<any> = useRef<HTMLVideoElement | MediaStream>();
   const peersRef = useRef<Peers[]>([]);
-
+  console.log(myInfo);
   useEffect(() => {
+    console.log("CALLED");
     socket.current = connect(SOCKETURI);
-    socket.current?.on(USERID, (ID: string) => {
+    socket.current?.on(USERID, (data: { ID: string }) => {
       dispatch(
         userActions.setUser({
           isAdmin: myInfo.isAdmin,
           roomID: myInfo.roomID as string,
-          socketID: ID,
+          socketID: data.ID,
           token: myInfo.token as string,
           username: myInfo.username as string,
+          position: myInfo.position,
         })
       );
       setUsers((prevState) => [
@@ -84,6 +87,7 @@ const Room: FC<{
           roomID: myInfo.roomID,
           username: myInfo.username,
           id: myInfo.socketID,
+          position: myInfo.position,
         });
         socket.current?.on(ROOMSTATUS, (data: { msg: string }) => {
           if (data.msg.includes("full")) {
@@ -96,13 +100,14 @@ const Room: FC<{
           (data: {
             users: { id: string; position: number; username: string }[];
           }) => {
+            console.log(users);
             // CREATE CLASS BASED OFF OF HOW WE STORE DATA IN THE BACKEND;
             const Self = data.users.filter((User) => {
               return User.id === myInfo.socketID;
             });
             dispatch(userActions.setPosition({ position: Self[0].position }));
             const usersInRoom = data.users.filter((User) => {
-              return User.id != myInfo.socketID;
+              return User.id !== myInfo.socketID;
             });
             const peers: Peer.Instance[] = [];
             usersInRoom.forEach((user) => {
@@ -179,13 +184,14 @@ const Room: FC<{
         setPeers(peers);
       }
     });
-  });
+  }, []);
 
   const chatHandler: (data: MessageDatagram) => void = async (
     data: MessageDatagram
   ) => {
     data.room = myInfo.roomID as string;
-    data.user.id = myInfo.socketID as string;
+    data.user.position = myInfo.position;
+    data.user.username = myInfo.username as string;
     if (data.user.msg !== null) {
       socket.current?.emit(MESSAGES, data);
     }
@@ -205,12 +211,11 @@ const Room: FC<{
   const roomExit: (e: MouseEvent<HTMLButtonElement>) => void = (
     e: MouseEvent<HTMLButtonElement>
   ) => {
-    const { value } = e.currentTarget;
-    if (value.trim() === "Leave") {
-      //   dispatch(authActions.logout());
-      socket.current?.emit(DISCONNECT, { room: myInfo.socketID });
-      nav(HOMEPAGE, { replace: true });
-    }
+    socket.current?.emit(LEAVE, {
+      room: myInfo.roomID,
+      user: { id: myInfo.socketID, username: myInfo.username },
+    });
+    nav(HOMEPAGE, { replace: true });
   };
 
   const videoHandler: () => void = () => {

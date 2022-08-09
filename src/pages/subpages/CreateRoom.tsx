@@ -13,7 +13,7 @@ import Settings from "../../component/forms/create/Settings";
 import { CREATEROOM, ROOM } from "../../component/UI/Constatns";
 import { userActions } from "../../store/user/user-slice";
 import classes from "../../styles/CreateRoomStyles.module.css";
-import { CreatedRoom, User } from "../../types/types";
+import { Room, User } from "../../types/types";
 
 const CreateRoom: FC<{
   params: URLSearchParams;
@@ -25,7 +25,7 @@ const CreateRoom: FC<{
 }> = ({ params, axios, nav, isMobile, user, dispatch }) => {
   const URL: string = ROOM.substring(0, 9);
   const isLoggedin: boolean = params.get("loggedIn") as unknown as boolean;
-  const [room, setRoom] = useState<CreatedRoom>({
+  const [room, setRoom] = useState<Room>({
     name: "",
     creator: "",
     capacity: 0,
@@ -35,22 +35,30 @@ const CreateRoom: FC<{
   useEffect(() => {
     if (room.capacity === 0) return;
     const fetchCreateRoom: (
-      createdRoom: CreatedRoom,
+      createdRoom: Room,
       axios: AxiosStatic,
       nav: NavigateFunction
     ) => void = async (room, axios, nav) => {
       await axios
         .post(CREATEROOM, room)
         .then((response) => {
-          const { roomName, roomID, position } = response.data;
-          dispatch(userActions.setRoom({ roomID: roomID }));
-          dispatch(userActions.setPosition({ position: position }));
+          const { roomName, roomID, position, username } = response.data;
+          dispatch(
+            userActions.setUser({
+              isAdmin: true,
+              username: username,
+              token: user.token as string,
+              roomID: roomID,
+              socketID: user.socketID,
+              position: position,
+            })
+          );
           nav(`${URL}?room=${roomName}`, { replace: true });
         })
         .catch(() => setValid(false));
     };
     fetchCreateRoom(room, axios, nav);
-  }, [room, axios, nav, URL, dispatch]);
+  }, [room, axios, nav, URL, dispatch, user.socketID, user.token]);
 
   return (
     <Grid className={classes.mainContainer} container>

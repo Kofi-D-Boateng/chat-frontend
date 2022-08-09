@@ -44,8 +44,10 @@ const userSlice = createSlice({
         isAdmin: boolean;
         roomID: string;
         socketID: string;
+        position: number;
       }>
     ) {
+      console.log(action.payload.socketID);
       state.token =
         state.token && state.token.trim().length > 0
           ? state.token
@@ -59,10 +61,8 @@ const userSlice = createSlice({
         state.roomID && state.roomID?.trim().length > 0
           ? state.roomID
           : action.payload.roomID;
-      state.socketID =
-        state.socketID.trim().length > 0
-          ? state.socketID
-          : action.payload.socketID;
+      state.socketID = action.payload.socketID;
+      state.position = action.payload.position;
     },
     setPosition(state, action: PayloadAction<{ position: number }>) {
       state.position = action.payload.position;

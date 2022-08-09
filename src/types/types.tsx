@@ -38,7 +38,7 @@ export type Messages = {
   sender: string;
 };
 
-export type CreatedRoom = {
+export type Room = {
   name: string;
   creator: string;
   capacity: number;
@@ -47,7 +47,8 @@ export type CreatedRoom = {
 export type MessageDatagram = {
   room: string;
   user: {
-    id: string;
+    position: number;
     msg: string;
+    username: string;
   };
 };

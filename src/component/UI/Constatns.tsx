@@ -30,7 +30,7 @@ const SIGNAL: string = "signal";
 const SENDINGSIGNAL: string = "sending-signal";
 const RETURNINGSIGNAL: string = "returning-signal";
 const MESSAGES: string = "message";
-const DISCONNECT: string = "disconnect";
+const LEAVE: string = "leave";
 
 export {
   SETUPROOM,
@@ -53,7 +53,7 @@ export {
   RECEIVESIGNAL,
   CHAT,
   USERSLEFTINROOM,
-  DISCONNECT,
+  LEAVE,
   MESSAGES,
   RETURNINGSIGNAL,
   SIGNAL,
