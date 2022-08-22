@@ -1,7 +1,12 @@
+.msgTitle {
+  font-size: 1rem;
+}
+
 .peerMsg {
   background-color: lightgray;
-  border: 1px solid 20px;
-  max-width: 80%;
+  border-radius: 10px;
+  border: 1px solid black;
+  max-width: 60%;
   margin: 4% 1%;
   float: right;
   text-align: left;
@@ -10,9 +15,10 @@
 }
 
 .msg {
-  background-color: white;
-  border: 1px solid 20px;
-  max-width: 80%;
+  background-color: lightblue;
+  border-radius: 10px;
+  border: 1px solid black;
+  max-width: 60%;
   margin: 4% 1%;
   text-align: left;
   padding: 0 20px;

@@ -18,6 +18,10 @@ const roomSlice = createSlice({
       state.creator = action.payload.creator;
       state.capacity = action.payload.capacity;
     },
+    getRoomName(state, action: PayloadAction<{ name: string }>) {
+      state.name = action.payload.name;
+      sessionStorage.setItem("roomName", state.name);
+    },
   },
 });
 

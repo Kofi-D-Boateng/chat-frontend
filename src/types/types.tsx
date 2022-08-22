@@ -1,4 +1,6 @@
+import { MutableRefObject } from "react";
 import Peer from "simple-peer";
+import { Socket } from "socket.io-client";
 
 export type User = {
   token: string | null;
@@ -6,8 +8,8 @@ export type User = {
   roomID: string | null;
   isLoggedIn: boolean;
   username: string | null;
-  socketID: string;
-  position: number;
+  socketID: string | null;
+  position: number | null;
 };
 
 export type Video = {
@@ -21,9 +23,10 @@ export type Peers = {
   instance: Peer.Instance;
 };
 
-export type Participants = {
+export type Participant = {
   alias: string;
-  roomID: string;
+  id: string;
+  instance: Peer.Instance;
 };
 
 export type UserDatagram = {
@@ -51,4 +54,30 @@ export type MessageDatagram = {
     msg: string;
     username: string;
   };
+};
+
+export type addPeerData = {
+  signal: Peer.SignalData;
+  stream: MediaStream;
+  callerID: string;
+  socket: MutableRefObject<Socket | undefined>;
+};
+
+export type createPeerData = {
+  myID: string;
+  userToSignal: string;
+  roomID: string;
+  stream: MediaStream;
+  socket: MutableRefObject<Socket | undefined>;
+};
+
+export type leaveData = {
+  leaver: string;
+  peers: Participant[];
+  peersRef: MutableRefObject<
+    {
+      peerID: string;
+      instance: Peer.Instance;
+    }[]
+  >;
 };

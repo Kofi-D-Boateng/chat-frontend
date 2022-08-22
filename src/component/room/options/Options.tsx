@@ -1,5 +1,4 @@
 import { FC, MouseEvent } from "react";
-import { Instance } from "simple-peer";
 import Play from "@mui/icons-material/PlayCircleFilledOutlined";
 import Pause from "@mui/icons-material/Pause";
 import Group from "@mui/icons-material/Group";
@@ -9,6 +8,7 @@ import Chat from "@mui/icons-material/Chat";
 import { IconButton, Badge, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
+import { Participant } from "../../../types/types";
 // import classes from "../../../styles/OptionsStyles.module.css";
 
 const Options: FC<{
@@ -16,7 +16,7 @@ const Options: FC<{
   onSetAudio: () => void;
   onHide: () => void;
   onLeave: (e: MouseEvent<HTMLButtonElement>) => void;
-  users: Instance[];
+  users: Participant[];
   count: number;
   isMobile: boolean;
 }> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count }) => {

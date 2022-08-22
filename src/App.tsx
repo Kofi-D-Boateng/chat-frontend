@@ -63,6 +63,7 @@ const App: FC = () => {
                 params={params}
                 nav={navigation}
                 isMobile={isMobile}
+                user={USER}
               />
             }
           />
@@ -74,6 +75,7 @@ const App: FC = () => {
                 nav={navigation}
                 dispatch={dispatch}
                 param={params}
+                myInfo={USER}
               />
             }
           />

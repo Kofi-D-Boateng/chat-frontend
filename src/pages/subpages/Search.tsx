@@ -1,10 +1,16 @@
-import { Grid, Typography } from "@mui/material";
+import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 import { AxiosStatic } from "axios";
-import { Dispatch, FC, useEffect, useState } from "react";
+import { Dispatch, FC, FormEvent, useEffect, useRef, useState } from "react";
 import { NavigateFunction } from "react-router-dom";
+import UserJoinForm from "../../component/forms/userJoin/UserJoinForm";
 import { FINDROOM, REDIRECT, ROOM } from "../../component/UI/Constatns";
 import LoadingSpinner from "../../component/UI/LoadingSpinner";
 import { userActions } from "../../store/user/user-slice";
+import { User } from "../../types/types";
+import classes from "../../styles/SearchStyles.module.css";
+import { roomActions } from "../../store/room/room-slice";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 const Search: FC<{
   axios: AxiosStatic;
@@ -12,9 +18,13 @@ const Search: FC<{
   params: URLSearchParams;
   nav: NavigateFunction;
   isMobile: boolean;
-}> = ({ axios, dispatch, params, nav }) => {
-  const room: string | null = params.get("room");
+  user: User;
+}> = ({ axios, dispatch, params, nav, user, isMobile }) => {
+  const roomName: string = useSelector((state: RootState) => state.room.name);
+  const roomID: string | null = params.get("roomID");
   const [result, setResult] = useState<number>(0);
+  const usernameRef = useRef<HTMLInputElement | undefined>();
+  const URL: string = ROOM.substring(0, 9);
   useEffect(() => {
     const findRoomStatus: (
       axios: AxiosStatic,
@@ -24,21 +34,8 @@ const Search: FC<{
       await axios
         .get(FINDROOM, { params: { key: room } })
         .then((response) => {
+          dispatch(roomActions.getRoomName({ name: response.data.roomName }));
           setResult(200);
-          dispatch(
-            userActions.setUser({
-              username: response.data.username,
-              isAdmin: false,
-              roomID: response.data.roomID,
-              token: response.data.token,
-              socketID: "",
-              position: 0,
-            })
-          );
-          setTimeout(() => {
-            nav(`${ROOM}/${room}`, { replace: true });
-          }, 2000);
-          clearTimeout();
         })
         .catch(() => {
           setResult(400);
@@ -49,19 +46,41 @@ const Search: FC<{
           clearTimeout();
         });
     };
-    findRoomStatus(axios, room as string, nav);
-  }, [axios, dispatch, nav, room]);
+    findRoomStatus(axios, roomID as string, nav);
+  }, [axios, dispatch, nav, roomID]);
+  const submitHandler: (e: FormEvent<HTMLFormElement>) => void = (e) => {
+    e.preventDefault();
+    dispatch(
+      userActions.setUser({
+        isAdmin: false,
+        position: user.position,
+        roomID: roomID,
+        socketID: user.socketID,
+        username: usernameRef.current?.value as string,
+        token: user.token as string,
+      })
+    );
+    nav(`${URL}?room=${roomName}`, { replace: true });
+  };
   return (
     <Grid container>
       {result === 0 ? (
         <LoadingSpinner />
       ) : result === 200 ? (
-        <Grid sx={{ margin: "auto" }} container>
-          <Typography variant="h3">Joining room....</Typography>
-        </Grid>
+        <UserJoinForm
+          isMobile={isMobile}
+          classes={classes}
+          username={usernameRef}
+          Card={Card}
+          TextField={TextField}
+          Button={Button}
+          submit={submitHandler}
+        />
       ) : (
-        <Grid sx={{ margin: "auto" }} container>
-          <Typography variant="h3">Room was not found.</Typography>
+        <Grid container>
+          <Typography className={classes.center} variant="h3">
+            Room was not found!
+          </Typography>
         </Grid>
       )}
     </Grid>

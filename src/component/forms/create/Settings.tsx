@@ -17,9 +17,6 @@ const Settings: FC<{
   const capacityRef = useRef<HTMLInputElement | undefined>();
   const submitHandler: (e: FormEvent) => void = (e) => {
     e.preventDefault();
-    console.log(roomNameRef.current?.value);
-    console.log(usernameRef.current?.value);
-    console.log(capacityRef.current?.value);
     const numberCheck = parseInt(capacityRef.current?.value as string);
     if (!roomNameRef.current?.value || !usernameRef.current?.value) return;
 

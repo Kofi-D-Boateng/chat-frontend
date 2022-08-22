@@ -28,7 +28,7 @@ const Homepage: FC<{
 
   useEffect(() => {
     if ((room.id.trim().length as number) > 0) {
-      nav(`${SEARCH}?room=${room.id}`, { replace: true });
+      nav(`${SEARCH}?roomID=${room.id}`, { replace: true });
     }
   }, [room, nav, axios, dispatch]);
 

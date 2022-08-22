@@ -15,11 +15,13 @@ const Message: FC<{
   Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
 }> = ({ classes, id, message, myID, sender, time, Grid, Typography }) => {
   const check: boolean = id === myID;
+  // console.log(sender);
+  // console.log(message);
   return (
     <Grid className={check ? classes.msg : classes.peerMsg} container>
       <Grid xs={12} md={12} item>
-        <Typography variant="h6">
-          {check ? "You" : sender}: {time}
+        <Typography variant="h6" className={classes.msgTitle}>
+          {check ? `You:${time}` : `${sender}:${time}`}
         </Typography>
       </Grid>
       <Grid xs={12} md={12} item>

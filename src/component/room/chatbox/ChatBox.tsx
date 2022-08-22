@@ -1,50 +1,21 @@
-import {
-  ButtonTypeMap,
-  ExtendButtonBase,
-  GridTypeMap,
-  TextFieldProps,
-  TypographyTypeMap,
-} from "@mui/material";
-import { OverridableComponent } from "@mui/material/OverridableComponent";
-import {
-  FC,
-  FocusEvent,
-  KeyboardEvent,
-  MutableRefObject,
-  useRef,
-  useState,
-} from "react";
-import { MessageDatagram, Messages, Peers } from "../../../types/types";
+import { Button, Grid, TextField, Typography } from "@mui/material";
+import { FC, FocusEvent, KeyboardEvent, useRef, useState } from "react";
+import { MessageDatagram, Messages, Participant } from "../../../types/types";
 import classes from "../../../styles/ChatStyles.module.css";
 import Message from "./messages/Message";
 
 const ChatBox: FC<{
   isMobile: boolean;
-  Me: string | null;
+  MyID: string | null;
   msgs: Messages[];
-  peers: MutableRefObject<Peers[]>;
+  peers: Participant[];
   hideText: boolean;
   onSend: (data: MessageDatagram) => void;
-  Grid: OverridableComponent<GridTypeMap<{}, "div">>;
-  Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
-  Button: ExtendButtonBase<ButtonTypeMap<{}, "button">>;
-  TextField: (props: TextFieldProps) => JSX.Element;
-}> = ({
-  Me,
-  hideText,
-  isMobile,
-  msgs,
-  peers,
-  Button,
-  Grid,
-  Typography,
-  onSend,
-  TextField,
-}) => {
+}> = ({ MyID, hideText, isMobile, msgs, peers, onSend }) => {
   const [limit, setLimit] = useState(250);
   const [showLabel, setShowLabel] = useState(false);
   const chatRef = useRef<HTMLInputElement>();
-
+  // console.log(msgs);
   const inputView: (event: FocusEvent<HTMLInputElement>) => void = (event) => {
     const { type } = event;
     if (type === "focus") {
@@ -59,7 +30,7 @@ const ChatBox: FC<{
   const limitHandler: (event: KeyboardEvent<HTMLDivElement>) => void = (
     event
   ) => {
-    console.log(event.key);
+    // console.log(event.key);
     const regex = /[A-Za-z0-9]/;
     const spaceRegEx = /Space/;
     const { key } = event;
@@ -69,13 +40,13 @@ const ChatBox: FC<{
     setShowLabel(true);
     if (key === "Backspace" && limit !== 250) {
       setLimit(limit + 1);
-      console.log(limit);
+      // console.log(limit);
       return;
     }
     if (regTest || spaceTest) {
       if (limit <= 250) {
         setLimit(limit - 1);
-        console.log(limit);
+        // console.log(limit);
       }
       return;
     }
@@ -90,7 +61,7 @@ const ChatBox: FC<{
 
     onSend({
       room: "",
-      user: { position: 0, username: Me as string, msg: text },
+      user: { position: 0, username: MyID as string, msg: text },
     });
     setShowLabel(false);
     setLimit(250);
@@ -112,7 +83,7 @@ const ChatBox: FC<{
                   classes={classes}
                   sender={map.sender}
                   id={map.id}
-                  myID={Me as string}
+                  myID={MyID as string}
                   time={map.timestamp}
                   message={map.message}
                   Grid={Grid}

@@ -46,13 +46,8 @@ const RegularFindRoom: FC<{
   return (
     <Grid container>
       <Grid container>
-        <Typography sx={{ margin: "auto" }} variant="h5">
-          Find a room to join!
-        </Typography>
-      </Grid>
-      <Grid container>
         <Typography sx={{ margin: "10px auto" }} variant="h5">
-          Enter room id or room name to join!
+          Enter a room ID to join or create your own!
         </Typography>
       </Grid>
       <Grid className={classes.search} container>
@@ -108,7 +103,7 @@ const RegularFindRoom: FC<{
               }}
               size="small"
               onClick={() =>
-                nav(SETUPROOM.substring(0, 13) + "?loggedIn=false", {
+                nav(`${SETUPROOM.substring(0, 13)}?loggedIn=false`, {
                   replace: true,
                 })
               }
