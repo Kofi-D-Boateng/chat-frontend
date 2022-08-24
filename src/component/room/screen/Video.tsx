@@ -9,16 +9,11 @@ const Video: FC<{
   peer: Participant;
 }> = ({ peer, classes }) => {
   const userVideo: ForwardedRef<any> = useRef<HTMLVideoElement | MediaStream>();
-  // console.log(peer);
   useEffect(() => {
-    console.log("CALLED");
     peer.instance?.on("stream", (stream) => {
-      console.log(userVideo);
       userVideo.current.srcObject = stream;
     });
-    console.log(userVideo);
   });
-  // console.log(ref);
   return (
     <Paper className={classes.paper} sx={{ backgroundColor: "black" }}>
       <Grid item xs={12} md={12}>

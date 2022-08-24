@@ -1,9 +1,4 @@
-import {
-  addPeerData,
-  createPeerData,
-  leaveData,
-  Participant,
-} from "../../../types/types";
+import { addPeerData, createPeerData, leaveData } from "../../../types/types";
 import Peer from "simple-peer";
 import { RETURNINGSIGNAL, SENDINGSIGNAL, SIGNAL } from "../../UI/Constatns";
 

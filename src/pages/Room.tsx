@@ -1,23 +1,13 @@
-import { Button, Grid, Paper, TextField, Typography } from "@mui/material";
-import {
-  Dispatch,
-  FC,
-  ForwardedRef,
-  useEffect,
-  useRef,
-  useState,
-  MouseEvent,
-  MutableRefObject,
-} from "react";
+import { Grid, Paper, Typography } from "@mui/material";
+import { Dispatch, FC, ForwardedRef, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { NavigateFunction } from "react-router-dom";
-import { connect, Socket, io } from "socket.io-client";
+import { connect, Socket } from "socket.io-client";
 import Peer from "simple-peer";
 import { RootState } from "../store/store";
 import { userActions } from "../store/user/user-slice";
 import {
-  addPeerData,
-  createPeerData,
+  MessageData,
   MessageDatagram,
   Messages,
   Participant,
@@ -25,23 +15,7 @@ import {
 } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
-import {
-  CHAT,
-  LEAVE,
-  GETUSERSINROOM,
-  HOMEPAGE,
-  JOINROOM,
-  MESSAGES,
-  RECEIVESIGNAL,
-  ROOMSTATUS,
-  SOCKETURI,
-  USERID,
-  USERJOINED,
-  USERSLEFTINROOM,
-  RETURNINGSIGNAL,
-  SENDINGSIGNAL,
-  SIGNAL,
-} from "../component/UI/Constatns";
+import { SOCKETURI } from "../component/UI/Constatns";
 
 import Video from "../component/room/screen/Video";
 import Options from "../component/room/options/Options";
@@ -62,13 +36,14 @@ const Room: FC<{
   const myInfo = useSelector((state: RootState) => state.user);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Participant[]>([]);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Messages[]>([]);
   const socket = useRef<Socket>();
   const userVideo: ForwardedRef<any> = useRef();
   const peersRef = useRef<{ peerID: string; instance: Peer.Instance }[]>([]);
+  const positionRef = useRef<number>(myInfo.position as number);
 
   useEffect(() => {
-    socket.current = connect("http://localhost:7000");
+    socket.current = connect(SOCKETURI);
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
@@ -94,6 +69,7 @@ const Room: FC<{
             position: number;
           }) => {
             const { users, position } = data;
+            if (!positionRef.current) positionRef.current = position;
             console.log(users);
             const peers: Participant[] = [];
             users.map((user) => {
@@ -156,14 +132,20 @@ const Room: FC<{
           item?.instance.signal(data.signal);
         });
 
-        socket.current?.on("chat", async (data) => {
-          const { message, id } = data;
-          const timestamp = new Date().toLocaleTimeString();
-          // setMessages((prev) => [
-          //   ...prev,
-          //   { id: id, message: message, time: timestamp, sender: user },
-          // ]);
-        });
+        socket.current?.on(
+          "chat",
+          async (data: { message: string; id: string; sender: string }) => {
+            const { message, id, sender } = data;
+            const timestamp = new Date().toLocaleTimeString();
+            const messageObject: Messages = {
+              id: id,
+              message,
+              sender: sender,
+              timestamp,
+            };
+            setMessages((prev) => [...prev, messageObject]);
+          }
+        );
 
         socket.current?.on("users-left", async (data) => {
           const { leaver } = data;
@@ -213,10 +195,19 @@ const Room: FC<{
     }
   };
 
-  const chatHandler = async (data: any) => {
-    const { msg } = data;
-    if (msg !== null) {
-      socket.current?.emit("message", { message: msg });
+  const chatHandler = async (data: MessageData) => {
+    const { message, id } = data;
+    const messageDatagram: MessageDatagram = {
+      room: myInfo.roomID as string,
+      user: {
+        id: id,
+        username: myInfo.username as string,
+        position: positionRef.current as number,
+        message: message,
+      },
+    };
+    if (messageDatagram.user.message !== null) {
+      socket.current?.emit("message", messageDatagram);
     }
   };
 
@@ -231,9 +222,16 @@ const Room: FC<{
     }
   };
 
-  const roomExit = (event: any) => {
+  const roomExit = () => {
     dispatch(userActions.clearUser());
-    socket.current?.emit("disconnect", { room: myInfo.roomID });
+    socket.current?.emit("leave", {
+      room: myInfo.roomID,
+      user: {
+        position: myInfo.position,
+        id: socket.current.id,
+        username: myInfo.username,
+      },
+    });
     nav("/", { replace: true });
   };
 
@@ -282,9 +280,8 @@ const Room: FC<{
         </Grid>
         <Chatbox
           isMobile={isMobile}
-          MyID={myInfo.socketID}
+          MyID={socket.current?.id as string}
           msgs={messages}
-          peers={peers}
           onSend={chatHandler}
           hideText={hideText}
         />

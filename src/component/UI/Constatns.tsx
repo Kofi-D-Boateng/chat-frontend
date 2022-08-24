@@ -17,6 +17,9 @@ const FETCHLOGIN: string = `http://localhost:${PORT}/${API_VERSION}/login/authen
 const FINDROOM: string = `http://localhost:${PORT}/${API_VERSION}/rooms/find-room`;
 const CREATEROOM: string = `http://localhost:${PORT}/${API_VERSION}/rooms/create-room`;
 
+// MESSAGE LENGTHS
+const characterLimit: number = 250;
+
 // SOCKET LITERALS
 const JOINROOM: string = "join-room";
 const ROOMSTATUS: string = "room-status";
@@ -33,6 +36,7 @@ const MESSAGES: string = "message";
 const LEAVE: string = "leave";
 
 export {
+  characterLimit,
   SETUPROOM,
   HOMEPAGE,
   REDIRECT,

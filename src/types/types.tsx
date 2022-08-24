@@ -47,12 +47,18 @@ export type Room = {
   capacity: number;
 };
 
+export type MessageData = {
+  id: string;
+  message: string;
+};
+
 export type MessageDatagram = {
   room: string;
   user: {
-    position: number;
-    msg: string;
+    id: string;
     username: string;
+    position: number;
+    message: string;
   };
 };
 

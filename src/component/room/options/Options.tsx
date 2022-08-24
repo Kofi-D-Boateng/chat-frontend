@@ -9,7 +9,6 @@ import { IconButton, Badge, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { Participant } from "../../../types/types";
-// import classes from "../../../styles/OptionsStyles.module.css";
 
 const Options: FC<{
   onSetVideo: () => void;

@@ -54,6 +54,11 @@
   position: relative;
 }
 
+.textField {
+  background-color: white;
+  margin: 0 5px;
+}
+
 .btn {
   margin: auto 0;
   max-width: 60%;
