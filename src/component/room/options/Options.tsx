@@ -5,6 +5,7 @@ import Group from "@mui/icons-material/Group";
 import Mic from "@mui/icons-material/Mic";
 import MicOff from "@mui/icons-material/MicOff";
 import Chat from "@mui/icons-material/Chat";
+import Share from "@mui/icons-material/Share";
 import { IconButton, Badge, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
@@ -15,14 +16,18 @@ const Options: FC<{
   onSetAudio: () => void;
   onHide: () => void;
   onLeave: (e: MouseEvent<HTMLButtonElement>) => void;
+  onLink: () => void;
   users: Participant[];
   count: number;
   isMobile: boolean;
-}> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count }) => {
+}> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count, onLink }) => {
   const video = useSelector((state: RootState) => state.video);
 
   return (
     <>
+      <IconButton sx={{ color: "white", margin: "0 10px" }} onClick={onLink}>
+        <Share />
+      </IconButton>
       <IconButton
         sx={{ color: "white" }}
         children={

@@ -25,6 +25,7 @@ import {
   addPeer,
   _LEAVE,
 } from "../component/room/functions/room-functions";
+import LinkCopyMessage from "../component/UI/Modal/LinkCopyMessage";
 
 const Room: FC<{
   isMobile: boolean;
@@ -34,6 +35,7 @@ const Room: FC<{
   myInfo: User;
 }> = ({ isMobile, nav, dispatch }) => {
   const myInfo = useSelector((state: RootState) => state.user);
+  const [view, setView] = useState<boolean>(false);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Participant[]>([]);
   const [messages, setMessages] = useState<Messages[]>([]);
@@ -56,7 +58,6 @@ const Room: FC<{
           position: myInfo.position,
         });
         socket.current?.on("room-status", (data) => {
-          console.log(data);
           if (data.msg.contains("full") || data.msg.contains("error")) {
             dispatch(userActions.clearUser());
             return;
@@ -70,7 +71,6 @@ const Room: FC<{
           }) => {
             const { users, position } = data;
             if (!positionRef.current) positionRef.current = position;
-            console.log(users);
             const peers: Participant[] = [];
             users.map((user) => {
               const peer = createPeer({
@@ -147,33 +147,44 @@ const Room: FC<{
           }
         );
 
-        socket.current?.on("users-left", async (data) => {
-          const { leaver } = data;
-          const REMAINERS = _LEAVE({
-            leaver: leaver,
-            peers: peers,
-            peersRef: peersRef,
-          });
-          if (REMAINERS.peers.length === 0) {
-            peersRef.current = [];
-            setPeers([]);
-          } else {
-            let peers: Participant[] = [];
-            REMAINERS.peers.forEach((p) => {
-              peers.push(p);
-              return true;
+        socket.current?.on(
+          "users-left",
+          async (data: {
+            leaver: string;
+            updatedList: {
+              id: string;
+              position: number;
+              username: string;
+            }[];
+          }) => {
+            const { leaver, updatedList } = data;
+            const newPosition = updatedList.find((p) => {
+              return p.id === socket.current?.id;
+            })?.position;
+            positionRef.current = newPosition!;
+            const REMAINERS = _LEAVE({
+              leaver: leaver,
+              peersRef: peersRef,
             });
-            console.log(peers);
-            setPeers(peers);
+            if (REMAINERS.length === 0) {
+              peersRef.current = [];
+              setPeers([]);
+            } else {
+              setPeers((prev) => {
+                const updatedPress = prev.filter((p) => {
+                  return p.id !== leaver;
+                });
+                return updatedPress;
+              });
+            }
           }
-        });
+        );
       });
   }, [myInfo, dispatch]);
 
   const videoHandler = () => {
     const src: MediaStream = userVideo.current.srcObject;
     const video = src.getTracks().find((track) => track.kind === "video");
-    console.log(video);
     if (video?.enabled) {
       video.enabled = false;
       dispatch(videoActions.setVideo({ isPlaying: true }));
@@ -193,6 +204,15 @@ const Room: FC<{
       mic!.enabled = true;
       dispatch(videoActions.setAudio({ canHear: true }));
     }
+  };
+
+  const linkHandler = () => {
+    navigator.clipboard.writeText(myInfo.roomID as string).then(() => {
+      setView(true);
+      setTimeout(() => {
+        setView(false);
+      }, 3000);
+    });
   };
 
   const chatHandler = async (data: MessageData) => {
@@ -227,7 +247,7 @@ const Room: FC<{
     socket.current?.emit("leave", {
       room: myInfo.roomID,
       user: {
-        position: myInfo.position,
+        position: positionRef.current,
         id: socket.current.id,
         username: myInfo.username,
       },
@@ -244,6 +264,7 @@ const Room: FC<{
           md={isMobile || hideText ? 12 : 9}
           item
         >
+          {view && <LinkCopyMessage classes={classes} isMobile={isMobile} />}
           <Grid sx={{ margin: "auto 0" }} container>
             <Paper className={classes.paper} sx={{ backgroundColor: "black" }}>
               <Grid xs={12} md={12} item>
@@ -270,6 +291,7 @@ const Room: FC<{
                 onSetVideo={videoHandler}
                 onSetAudio={micHandler}
                 onHide={viewHandler}
+                onLink={linkHandler}
                 users={peers}
                 onLeave={roomExit}
                 isMobile={isMobile}

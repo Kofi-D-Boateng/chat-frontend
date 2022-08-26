@@ -49,7 +49,6 @@ const ChatBox: FC<{
 
   const sendHandler: () => void = () => {
     const text = chatRef.current?.value as string;
-    console.log(text);
     if (limit <= 0 || limit === characterLimit || text.trim().length === 0) {
       return;
     }

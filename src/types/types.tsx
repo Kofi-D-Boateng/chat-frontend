@@ -79,7 +79,6 @@ export type createPeerData = {
 
 export type leaveData = {
   leaver: string;
-  peers: Participant[];
   peersRef: MutableRefObject<
     {
       peerID: string;

@@ -6,13 +6,7 @@ export const _LEAVE = (data: leaveData) => {
   const updatedRef = data.peersRef.current.filter((p) => {
     return p.peerID !== data.leaver;
   });
-  const updatedPeers = data.peers.filter((p) => {
-    return p.id !== data.leaver;
-  });
-  return {
-    peers: updatedPeers,
-    peersRef: updatedRef,
-  };
+  return updatedRef;
 };
 
 export const createPeer = (data: createPeerData) => {

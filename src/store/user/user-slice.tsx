@@ -48,7 +48,6 @@ const userSlice = createSlice({
         position: number | null;
       }>
     ) {
-      console.log(action.payload.socketID);
       state.token = state.token?.trim() ? state.token : action.payload.token;
       state.isAdmin = action.payload.isAdmin;
       state.username = state.username?.trim()

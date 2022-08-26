@@ -8,8 +8,7 @@ import {
 import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { LOGIN, SETUPROOM } from "../UI/Constatns";
-import RegularSearch from "../forms/search/RegularSearch";
+import { SETUPROOM } from "../UI/Constatns";
 
 const RegularFindRoom: FC<{
   Grid: OverridableComponent<GridTypeMap<{}, "div">>;
@@ -44,78 +43,81 @@ const RegularFindRoom: FC<{
   };
 
   return (
-    <Grid container>
+    <>
       <Grid container>
         <Typography sx={{ margin: "10px auto" }} variant="h5">
           Enter a room ID to join or create your own!
         </Typography>
       </Grid>
-      <Grid className={classes.search} container>
-        <RegularSearch
-          isMobile={isMobile}
-          Grid={Grid}
-          Button={Button}
-          TextField={TextField}
-          Submit={submitHandler}
-          ID={roomID}
-        />
-        <Grid className={classes.options} xs={12} md={6} item>
+      <form onSubmit={submitHandler}>
+        <Grid className={classes.search} container>
           <Grid container>
-            <Button
-              variant="outlined"
-              sx={{
-                margin: "10px auto",
-                maxWidth: "70%",
-                color: "green",
-                backgroundColor: "white",
-                borderColor: "green",
-                transitionDuration: "350ms",
-                textTransform: "none",
-                "&:hover": {
-                  color: "white",
-                  backgroundColor: "green",
-                  borderColor: "green",
-                },
-              }}
+            <TextField
+              sx={{ margin: "20px auto", maxWidth: "70%" }}
               size="small"
-              onClick={() => nav(LOGIN, { replace: true })}
+              placeholder="Enter Room ID"
+              type="text"
+              inputRef={roomID}
               fullWidth
-            >
-              Login
-            </Button>
+            />
           </Grid>
-          <Grid container>
-            <Button
-              variant="outlined"
-              sx={{
-                margin: "10px auto",
-                color: "green",
-                maxWidth: "70%",
-                backgroundColor: "white",
-                borderColor: "green",
-                textTransform: "none",
-                transitionDuration: "350ms",
-                "&:hover": {
-                  color: "white",
-                  backgroundColor: "green",
+          <Grid sx={{ margin: "20px auto", textAlign: "center" }} container>
+            <Grid sx={{ margin: "auto" }} xs={12} md={6} item>
+              <Button
+                variant="outlined"
+                sx={{
+                  margin: isMobile ? "10px 0" : "",
+                  color: "green",
+                  maxWidth: "70%",
+                  backgroundColor: "white",
                   borderColor: "green",
-                },
-              }}
-              size="small"
-              onClick={() =>
-                nav(`${SETUPROOM.substring(0, 13)}?loggedIn=false`, {
-                  replace: true,
-                })
-              }
-              fullWidth
-            >
-              Create Room
-            </Button>
+                  textTransform: "none",
+                  transitionDuration: "350ms",
+                  "&:hover": {
+                    color: "white",
+                    backgroundColor: "green",
+                    borderColor: "green",
+                  },
+                }}
+                type="submit"
+                size="small"
+                fullWidth
+              >
+                Join Room
+              </Button>
+            </Grid>
+            <Grid xs={12} md={6} item>
+              <Button
+                variant="outlined"
+                sx={{
+                  margin: isMobile ? "10px 0" : "",
+                  color: "green",
+                  maxWidth: "70%",
+                  backgroundColor: "white",
+                  borderColor: "green",
+                  textTransform: "none",
+                  transitionDuration: "350ms",
+                  "&:hover": {
+                    color: "white",
+                    backgroundColor: "green",
+                    borderColor: "green",
+                  },
+                }}
+                size="small"
+                onClick={() =>
+                  nav(`${SETUPROOM.substring(0, 13)}?loggedIn=false`, {
+                    replace: true,
+                  })
+                }
+                fullWidth
+              >
+                Create Room
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </Grid>
+      </form>
+    </>
   );
 };
-
 export default RegularFindRoom;

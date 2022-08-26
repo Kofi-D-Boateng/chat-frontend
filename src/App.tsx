@@ -9,12 +9,10 @@ import {
 } from "react-router-dom";
 import {
   HOMEPAGE,
-  LOGIN,
   REDIRECT,
   ROOM,
   SEARCH,
   SETUPROOM,
-  SIGNUP,
 } from "./component/UI/Constatns";
 import Layout from "./component/UI/Layout/Layout";
 import { User } from "./types/types";
@@ -24,8 +22,6 @@ import { Theme, useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
 const Homepage = lazy(() => import("./pages/Homepage"));
-const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
 const Room = lazy(() => import("./pages/Room"));
 const Search = lazy(() => import("./pages/subpages/Search"));
 const CreateRoom = lazy(() => import("./pages/subpages/CreateRoom"));
@@ -45,13 +41,7 @@ const App: FC = () => {
           <Route
             path={HOMEPAGE}
             element={
-              <Homepage
-                user={USER}
-                isMobile={isMobile}
-                axios={axios}
-                dispatch={dispatch}
-                param={params}
-              />
+              <Homepage isMobile={isMobile} axios={axios} dispatch={dispatch} />
             }
           />
           <Route
@@ -90,24 +80,6 @@ const App: FC = () => {
                 isMobile={isMobile}
                 user={USER}
               />
-            }
-          />
-          <Route
-            path={LOGIN}
-            element={
-              <Login
-                nav={navigation}
-                isMobile={isMobile}
-                params={params}
-                axios={axios}
-                dispatch={dispatch}
-              />
-            }
-          />
-          <Route
-            path={SIGNUP}
-            element={
-              <Signup nav={navigation} isMobile={isMobile} axios={axios} />
             }
           />
           <Route path={REDIRECT} element={<Navigate replace to={HOMEPAGE} />} />
