@@ -18,8 +18,8 @@ const Message: FC<{
   return (
     <Grid className={check ? classes.msg : classes.peerMsg} container>
       <Grid xs={12} md={12} item>
-        <Typography variant="h6">
-          {check ? "You" : sender}: {time}
+        <Typography variant="h6" className={classes.msgTitle}>
+          {check ? `You:${time}` : `${sender}:${time}`}
         </Typography>
       </Grid>
       <Grid xs={12} md={12} item>

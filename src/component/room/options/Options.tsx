@@ -1,32 +1,37 @@
 import { FC, MouseEvent } from "react";
-import { Instance } from "simple-peer";
 import Play from "@mui/icons-material/PlayCircleFilledOutlined";
 import Pause from "@mui/icons-material/Pause";
 import Group from "@mui/icons-material/Group";
 import Mic from "@mui/icons-material/Mic";
 import MicOff from "@mui/icons-material/MicOff";
 import Chat from "@mui/icons-material/Chat";
+import Share from "@mui/icons-material/Share";
 import { IconButton, Badge, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import classes from "../../../styles/OptionsStyles.module.css";
+import { Participant } from "../../../types/types";
 
 const Options: FC<{
   onSetVideo: () => void;
   onSetAudio: () => void;
   onHide: () => void;
   onLeave: (e: MouseEvent<HTMLButtonElement>) => void;
-  users: Instance[];
+  onLink: () => void;
+  users: Participant[];
   count: number;
   isMobile: boolean;
-}> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count }) => {
+}> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count, onLink }) => {
   const video = useSelector((state: RootState) => state.video);
+
   return (
     <>
+      <IconButton sx={{ color: "white", margin: "0 10px" }} onClick={onLink}>
+        <Share />
+      </IconButton>
       <IconButton
         sx={{ color: "white" }}
         children={
-          <Badge badgeContent={users.length + 1} className={classes.test}>
+          <Badge badgeContent={users.length + 1}>
             <Group fontSize="large" />
           </Badge>
         }
@@ -37,7 +42,7 @@ const Options: FC<{
           value="mute"
           onClick={onSetAudio}
         >
-          <Mic fontSize="large" className={classes.micIcon} />
+          <Mic fontSize="large" />
         </IconButton>
       ) : (
         <IconButton
@@ -45,7 +50,7 @@ const Options: FC<{
           value="unmute"
           onClick={onSetAudio}
         >
-          <MicOff fontSize="large" className={classes.micIcon} />
+          <MicOff fontSize="large" />
         </IconButton>
       )}
       {video.isPlaying ? (
@@ -53,16 +58,14 @@ const Options: FC<{
           sx={{ color: "white", margin: "0 10px" }}
           value="pause"
           onClick={onSetVideo}
-          className={classes.vizIcon}
           size="small"
-          children={<Pause fontSize="large" className={classes.pause} />}
+          children={<Pause fontSize="large" />}
         />
       ) : (
         <IconButton
           sx={{ color: "white", margin: "0 10px" }}
           value="play"
           onClick={onSetVideo}
-          className={classes.vizIcon}
           size="small"
           children={<Play fontSize="large" />}
         />

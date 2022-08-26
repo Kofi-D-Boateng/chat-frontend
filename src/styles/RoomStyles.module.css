@@ -1,7 +1,57 @@
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .screen {
   background-color: black;
   position: relative;
   min-height: 100vh;
+  border: #1a1a1a solid 1px;
 }
 
 .video {
@@ -28,4 +78,34 @@
   width: 100%;
   padding: 10px 0;
   position: absolute;
+}
+
+.card {
+  border: 0.5px solid black;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30%;
+  z-index: 5;
+  text-align: center;
+  animation: fadeOut;
+  -webkit-animation: fadeOut 4s;
+  -moz-animation: fadeOut 4s;
+  -o-animation: fadeOut 4s;
+}
+
+.mobCard {
+  border: 0.5px solid black;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  z-index: 5;
+  text-align: center;
+  animation: fadeOut;
+  -webkit-animation: fadeOut 4s;
+  -moz-animation: fadeOut 4s;
+  -o-animation: fadeOut 4s;
 }

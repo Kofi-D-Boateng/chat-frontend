@@ -1,50 +1,21 @@
-import {
-  ButtonTypeMap,
-  ExtendButtonBase,
-  GridTypeMap,
-  TextFieldProps,
-  TypographyTypeMap,
-} from "@mui/material";
-import { OverridableComponent } from "@mui/material/OverridableComponent";
-import {
-  FC,
-  FocusEvent,
-  KeyboardEvent,
-  MutableRefObject,
-  useRef,
-  useState,
-} from "react";
-import { Messages, Peers } from "../../../types/types";
+import { Button, Grid, TextField, Typography } from "@mui/material";
+import { FC, FocusEvent, KeyboardEvent, useRef, useState } from "react";
+import { MessageData, Messages } from "../../../types/types";
 import classes from "../../../styles/ChatStyles.module.css";
 import Message from "./messages/Message";
+import { characterLimit } from "../../UI/Constatns";
+import { regex, spaceRegEx } from "../../UI/RegExp";
 
 const ChatBox: FC<{
   isMobile: boolean;
-  Me: string | null;
+  MyID: string | null;
   msgs: Messages[];
-  peers: MutableRefObject<Peers[]>;
   hideText: boolean;
-  onSend: (data: { msg: string }) => void;
-  Grid: OverridableComponent<GridTypeMap<{}, "div">>;
-  Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
-  Button: ExtendButtonBase<ButtonTypeMap<{}, "button">>;
-  TextField: (props: TextFieldProps) => JSX.Element;
-}> = ({
-  Me,
-  hideText,
-  isMobile,
-  msgs,
-  peers,
-  Button,
-  Grid,
-  Typography,
-  onSend,
-  TextField,
-}) => {
-  const [limit, setLimit] = useState(250);
+  onSend: (data: MessageData) => void;
+}> = ({ MyID, hideText, isMobile, msgs, onSend }) => {
+  const [limit, setLimit] = useState<number>(characterLimit);
   const [showLabel, setShowLabel] = useState(false);
   const chatRef = useRef<HTMLInputElement>();
-
   const inputView: (event: FocusEvent<HTMLInputElement>) => void = (event) => {
     const { type } = event;
     if (type === "focus") {
@@ -59,23 +30,18 @@ const ChatBox: FC<{
   const limitHandler: (event: KeyboardEvent<HTMLDivElement>) => void = (
     event
   ) => {
-    console.log(event.key);
-    const regex = /[A-Za-z0-9]/;
-    const spaceRegEx = /Space/;
     const { key } = event;
     const { code } = event;
-    const regTest = regex.test(key);
-    const spaceTest = spaceRegEx.test(code);
+    const char = regex.test(key);
+    const spacebar = spaceRegEx.test(code);
     setShowLabel(true);
-    if (key === "Backspace" && limit !== 250) {
+    if (key === "Backspace" && limit < characterLimit) {
       setLimit(limit + 1);
-      console.log(limit);
       return;
     }
-    if (regTest || spaceTest) {
-      if (limit <= 250) {
+    if (char || spacebar) {
+      if (key !== "Backspace" && limit !== 0) {
         setLimit(limit - 1);
-        console.log(limit);
       }
       return;
     }
@@ -83,14 +49,16 @@ const ChatBox: FC<{
 
   const sendHandler: () => void = () => {
     const text = chatRef.current?.value as string;
-    console.log(text);
-    if (limit <= 0 || text.trim().length === 0) {
+    if (limit <= 0 || limit === characterLimit || text.trim().length === 0) {
       return;
     }
 
-    onSend({ msg: text });
+    onSend({
+      id: MyID as string,
+      message: text,
+    });
     setShowLabel(false);
-    setLimit(250);
+    setLimit(characterLimit);
     chatRef.current!.value = "";
   };
 
@@ -109,7 +77,7 @@ const ChatBox: FC<{
                   classes={classes}
                   sender={map.sender}
                   id={map.id}
-                  myID={Me as string}
+                  myID={MyID as string}
                   time={map.timestamp}
                   message={map.message}
                   Grid={Grid}
@@ -122,8 +90,8 @@ const ChatBox: FC<{
             <Grid container>
               <Grid md={9} item>
                 <TextField
-                  variant="standard"
-                  label={showLabel && `${limit}/250`}
+                  variant="filled"
+                  label={showLabel && `${limit}/${characterLimit}`}
                   className={classes.textField}
                   onKeyDown={limitHandler}
                   onFocus={inputView}

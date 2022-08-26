@@ -3,8 +3,17 @@ import { FC } from "react";
 
 const LoadingSpinner: FC = () => {
   return (
-    <Box sx={{ position: "relative", textAlign: "center", padding: "60px 0" }}>
-      <CircularProgress />
+    <Box>
+      <CircularProgress
+        sx={{
+          margin: "auto",
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%,-50%)",
+          width: "50%",
+        }}
+      />
     </Box>
   );
 };
