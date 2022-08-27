@@ -179,7 +179,7 @@ const Room: FC<{
           }
         );
       });
-  }, []);
+  }, [myInfo, dispatch]);
 
   const videoHandler = () => {
     const src: MediaStream = userVideo.current.srcObject;
