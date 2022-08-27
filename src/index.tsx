@@ -9,14 +9,6 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#03a9f4",
-    },
-    secondary: {
-      main: "#FEFDFC",
-    },
-  },
   typography: {
     fontFamily: "Noto JP Sans",
   },
