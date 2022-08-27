@@ -54,7 +54,6 @@ const Room: FC<{
         socket.current?.emit("join-room", {
           roomID: myInfo.roomID,
           username: myInfo.username as string,
-          id: socket.current?.id as string,
           position: myInfo.position,
         });
         socket.current?.on("room-status", (data) => {
@@ -292,7 +291,7 @@ const Room: FC<{
                 onSetAudio={micHandler}
                 onHide={viewHandler}
                 onLink={linkHandler}
-                users={peers}
+                length={peers.length}
                 onLeave={roomExit}
                 isMobile={isMobile}
                 count={messages.length}

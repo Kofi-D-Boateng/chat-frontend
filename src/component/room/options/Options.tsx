@@ -9,7 +9,6 @@ import Share from "@mui/icons-material/Share";
 import { IconButton, Badge, Button } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { Participant } from "../../../types/types";
 
 const Options: FC<{
   onSetVideo: () => void;
@@ -17,21 +16,21 @@ const Options: FC<{
   onHide: () => void;
   onLeave: (e: MouseEvent<HTMLButtonElement>) => void;
   onLink: () => void;
-  users: Participant[];
+  length: number;
   count: number;
   isMobile: boolean;
-}> = ({ onHide, onSetAudio, onSetVideo, users, onLeave, count, onLink }) => {
+}> = ({ onHide, onSetAudio, onSetVideo, length, onLeave, count, onLink }) => {
   const video = useSelector((state: RootState) => state.video);
 
   return (
     <>
       <IconButton sx={{ color: "white", margin: "0 10px" }} onClick={onLink}>
-        <Share />
+        <Share fontSize="large" />
       </IconButton>
       <IconButton
         sx={{ color: "white" }}
         children={
-          <Badge badgeContent={users.length + 1}>
+          <Badge badgeContent={length + 1}>
             <Group fontSize="large" />
           </Badge>
         }
