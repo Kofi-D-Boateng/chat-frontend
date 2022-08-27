@@ -4,14 +4,39 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { STORE } from "./store/store";
+import { createTheme, ThemeProvider } from "@mui/material";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#03a9f4",
+    },
+    secondary: {
+      main: "#FEFDFC",
+    },
+  },
+  typography: {
+    fontFamily: "Noto JP Sans",
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 root.render(
   <Provider store={STORE}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
   </Provider>
 );
 

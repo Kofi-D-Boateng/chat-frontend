@@ -30,7 +30,6 @@ const CreateRoom: FC<{
     creator: "",
     capacity: 0,
   });
-  const [valid, setValid] = useState<boolean>(true);
 
   useEffect(() => {
     if (room.capacity === 0) return;
@@ -55,7 +54,7 @@ const CreateRoom: FC<{
           );
           nav(`${URL}?room=${roomName}`, { replace: true });
         })
-        .catch(() => setValid(false));
+        .catch();
     };
     fetchCreateRoom(room, axios, nav);
   }, [room, axios, nav, URL, dispatch, user.socketID, user.token]);
