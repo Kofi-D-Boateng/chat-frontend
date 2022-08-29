@@ -45,7 +45,10 @@ const RegularFindRoom: FC<{
   return (
     <>
       <Grid container>
-        <Typography sx={{ margin: "10px auto" }} variant="h5">
+        <Typography
+          sx={{ margin: "10px auto", textAlign: "center" }}
+          variant="h5"
+        >
           Enter a room ID to join or create your own!
         </Typography>
       </Grid>
