@@ -28,12 +28,12 @@
 }
 
 .form {
-  margin: auto;
+  text-align: center;
 }
 
 .textField {
-  margin: 20px 0;
-  width: 60%;
+  margin: 20px 0px;
+  width: 80%;
 }
 
 .btn {
@@ -41,7 +41,8 @@
   color: green;
   transition-duration: 500ms;
   transition-property: color, border, background-color;
-  width: 70%;
+  margin: 20px 0px;
+  width: 80%;
 }
 
 .btn:hover {

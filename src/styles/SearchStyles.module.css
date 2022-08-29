@@ -18,6 +18,15 @@
   transform: translate(-50%, -50%);
 }
 
+.error {
+  width: 30%;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .btn {
   color: green;
   border: green;
@@ -37,9 +46,7 @@
   border: 1px solid black;
   text-align: center;
   background-color: lightgray;
-}
-
-.input {
+  color: white;
 }
 
 .input:focus {

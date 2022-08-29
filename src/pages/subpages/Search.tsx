@@ -77,8 +77,8 @@ const Search: FC<{
           submit={submitHandler}
         />
       ) : (
-        <Grid container>
-          <Typography className={classes.center} variant="h3">
+        <Grid className={classes.error} container>
+          <Typography sx={{ margin: "center" }} variant="h5">
             Room was not found!
           </Typography>
         </Grid>
