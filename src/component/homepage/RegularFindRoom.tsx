@@ -108,7 +108,7 @@ const RegularFindRoom: FC<{
                 }}
                 size="small"
                 onClick={() =>
-                  nav(`${SETUPROOM.substring(0, 13)}?loggedIn=false`, {
+                  nav(`${SETUPROOM.substring(0, 13)}`, {
                     replace: true,
                   })
                 }

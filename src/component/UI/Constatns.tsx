@@ -9,7 +9,7 @@ const SIGNUP: string = "/signup";
 const LOGIN: string = "/login";
 const LOGGEDIN: string = HOMEPAGE + "?loggedIn=true";
 const SEARCH: string = "/search";
-const SETUPROOM: string = "/create-room/*";
+const SETUPROOM: string = "/create-room/";
 
 // EXTERNAL ROUTES
 const SOCKETURI: string = process.env.REACT_APP_SOCKET_URI || "/";
