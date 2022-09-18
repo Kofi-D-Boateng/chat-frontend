@@ -41,7 +41,7 @@ const CreateRoom: FC<{
       await axios
         .post(CREATEROOM, room)
         .then((response) => {
-          const { roomName, roomID, position, username } = response.data;
+          const { roomName, roomID, username } = response.data;
           dispatch(
             userActions.setUser({
               isAdmin: true,
@@ -49,7 +49,6 @@ const CreateRoom: FC<{
               token: user.token as string,
               roomID: roomID,
               socketID: user.socketID,
-              position: position,
             })
           );
           nav(`${URL}?room=${roomName}`, { replace: true });
