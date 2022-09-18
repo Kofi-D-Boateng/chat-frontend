@@ -9,7 +9,6 @@ export type User = {
   isLoggedIn: boolean;
   username: string | null;
   socketID: string | null;
-  position: number | null;
 };
 
 export type Video = {

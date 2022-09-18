@@ -42,7 +42,7 @@ const Room: FC<{
   const socket = useRef<Socket>();
   const userVideo: ForwardedRef<any> = useRef();
   const peersRef = useRef<{ peerID: string; instance: Peer.Instance }[]>([]);
-  const positionRef = useRef<number>(myInfo.position as number);
+  const positionRef = useRef<number>(0);
 
   useEffect(() => {
     socket.current = connect(SOCKETURI);
@@ -54,7 +54,6 @@ const Room: FC<{
         socket.current?.emit("join-room", {
           roomID: myInfo.roomID,
           username: myInfo.username as string,
-          position: myInfo.position,
         });
         socket.current?.on("room-status", (data) => {
           if (data.msg.contains("full") || data.msg.contains("error")) {

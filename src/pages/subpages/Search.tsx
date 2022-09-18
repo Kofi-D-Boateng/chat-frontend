@@ -43,7 +43,6 @@ const Search: FC<{
           setTimeout(() => {
             nav(REDIRECT, { replace: true });
           }, 2000);
-          clearTimeout();
         });
     };
     findRoomStatus(axios, roomID as string, nav);
@@ -53,7 +52,6 @@ const Search: FC<{
     dispatch(
       userActions.setUser({
         isAdmin: false,
-        position: user.position,
         roomID: roomID,
         socketID: user.socketID,
         username: usernameRef.current?.value as string,
