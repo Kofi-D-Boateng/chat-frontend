@@ -110,7 +110,7 @@ const ChatBox: FC<{
                 <Button
                   className={classes.btn}
                   type="button"
-                  variant="contained"
+                  variant="outlined"
                   size="small"
                   onClick={sendHandler}
                   fullWidth

@@ -1,6 +1,6 @@
 .card {
   width: 40%;
-  border: 0.5px solid black;
+  border: 1px solid black;
   margin: auto;
   position: absolute;
   top: 50%;
@@ -10,7 +10,7 @@
 
 .mobCard {
   width: 80%;
-  border: 0.5px solid black;
+  border: 1px solid black;
   margin: auto;
   position: absolute;
   top: 50%;
@@ -45,7 +45,7 @@
   padding: 10px 0;
   border: 1px solid black;
   text-align: center;
-  background-color: lightgray;
+  background-color: purple;
   color: white;
 }
 
