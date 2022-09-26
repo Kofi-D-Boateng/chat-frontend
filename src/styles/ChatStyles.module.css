@@ -27,7 +27,8 @@
 
 .title {
   border: solid black 1px;
-  background-color: lightgray;
+  background-color: purple;
+  color: white;
 }
 
 .chat {
@@ -62,4 +63,14 @@
 .btn {
   margin: auto 0;
   max-width: 60%;
+  background-color: white;
+  border-color: white;
+  color: purple;
+  transition-duration: 300ms;
+}
+
+.btn:hover {
+  background-color: purple;
+  border-color: purple;
+  color: white;
 }
