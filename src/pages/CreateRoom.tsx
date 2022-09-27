@@ -9,11 +9,11 @@ import {
 import { AxiosStatic } from "axios";
 import { Dispatch, FC, useEffect, useState } from "react";
 import { NavigateFunction } from "react-router-dom";
-import Settings from "../../component/forms/create/Settings";
-import { CREATEROOM, ROOM } from "../../component/UI/Constatns";
-import { userActions } from "../../store/user/user-slice";
+import Settings from "../component/forms/create/Settings";
+import { CREATEROOM, ROOM } from "../component/UI/Constatns";
+import { userActions } from "../store/user/user-slice";
 import classes from "../../styles/CreateRoomStyles.module.css";
-import { Room, User } from "../../types/types";
+import { Room, User } from "../types/types";
 
 const CreateRoom: FC<{
   params: URLSearchParams;

@@ -68,6 +68,7 @@ const RegularFindRoom: FC<{
             <Grid sx={{ margin: "auto" }} xs={12} md={6} item>
               <Button
                 variant="outlined"
+                id="join"
                 sx={{
                   margin: isMobile ? "10px 0" : "",
                   color: "green",
@@ -92,6 +93,7 @@ const RegularFindRoom: FC<{
             <Grid xs={12} md={6} item>
               <Button
                 variant="outlined"
+                id="create"
                 sx={{
                   margin: isMobile ? "10px 0" : "",
                   color: "green",
@@ -109,7 +111,7 @@ const RegularFindRoom: FC<{
                 size="small"
                 onClick={() =>
                   nav(`${SETUPROOM.substring(0, 13)}`, {
-                    replace: true,
+                    replace: false,
                   })
                 }
                 fullWidth
