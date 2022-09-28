@@ -2,15 +2,15 @@ import { Button, Card, Grid, TextField, Typography } from "@mui/material";
 import { AxiosStatic } from "axios";
 import { Dispatch, FC, FormEvent, useEffect, useRef, useState } from "react";
 import { NavigateFunction } from "react-router-dom";
-import UserJoinForm from "../../component/forms/userJoin/UserJoinForm";
-import { FINDROOM, REDIRECT, ROOM } from "../../component/UI/Constatns";
-import LoadingSpinner from "../../component/UI/LoadingSpinner";
-import { userActions } from "../../store/user/user-slice";
-import { User } from "../../types/types";
-import classes from "../../styles/SearchStyles.module.css";
-import { roomActions } from "../../store/room/room-slice";
+import UserJoinForm from "../component/forms/userJoin/UserJoinForm";
+import { FINDROOM, REDIRECT, ROOM } from "../component/UI/Constatns";
+import LoadingSpinner from "../component/UI/LoadingSpinner";
+import { userActions } from "../store/user/user-slice";
+import { User } from "../types/types";
+import classes from "../../src/styles/SearchStyles.module.css";
+import { roomActions } from "../store/room/room-slice";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { RootState } from "../store/store";
 
 const Search: FC<{
   axios: AxiosStatic;
@@ -23,7 +23,7 @@ const Search: FC<{
   const roomName: string = useSelector((state: RootState) => state.room.name);
   const roomID: string | null = params.get("roomID");
   const [result, setResult] = useState<number>(0);
-  const usernameRef = useRef<HTMLInputElement | undefined>();
+  const usernameRef = useRef<HTMLInputElement>();
   const URL: string = ROOM.substring(0, 9);
   useEffect(() => {
     const findRoomStatus: (

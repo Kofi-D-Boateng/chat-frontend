@@ -23,8 +23,8 @@ import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Room = lazy(() => import("./pages/Room"));
-const Search = lazy(() => import("./pages/subpages/Search"));
-const CreateRoom = lazy(() => import("./pages/subpages/CreateRoom"));
+const Search = lazy(() => import("./pages/Search"));
+const CreateRoom = lazy(() => import("./pages/CreateRoom"));
 
 const App: FC = () => {
   const USER: User = useSelector((state: RootState) => state.user);
