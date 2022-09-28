@@ -12,7 +12,7 @@ import { NavigateFunction } from "react-router-dom";
 import Settings from "../component/forms/create/Settings";
 import { CREATEROOM, ROOM } from "../component/UI/Constatns";
 import { userActions } from "../store/user/user-slice";
-import classes from "../../styles/CreateRoomStyles.module.css";
+import classes from "../../src/styles/CreateRoomStyles.module.css";
 import { Room, User } from "../types/types";
 
 const CreateRoom: FC<{

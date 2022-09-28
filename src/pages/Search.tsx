@@ -7,7 +7,7 @@ import { FINDROOM, REDIRECT, ROOM } from "../component/UI/Constatns";
 import LoadingSpinner from "../component/UI/LoadingSpinner";
 import { userActions } from "../store/user/user-slice";
 import { User } from "../types/types";
-import classes from "../../styles/SearchStyles.module.css";
+import classes from "../../src/styles/SearchStyles.module.css";
 import { roomActions } from "../store/room/room-slice";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
