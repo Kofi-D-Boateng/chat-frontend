@@ -50,7 +50,6 @@ const App: FC = () => {
               <Search
                 axios={axios}
                 dispatch={dispatch}
-                params={params}
                 nav={navigation}
                 isMobile={isMobile}
                 user={USER}

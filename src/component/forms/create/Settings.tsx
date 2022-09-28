@@ -1,17 +1,15 @@
 import { ButtonTypeMap, ExtendButtonBase, TextFieldProps } from "@mui/material";
 import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
-import { Room, User } from "../../../types/types";
+import { Room } from "../../../types/types";
 
 const Settings: FC<{
-  isLoggedIn: boolean;
-  user: User;
   TextField: (props: TextFieldProps) => JSX.Element;
   Button: ExtendButtonBase<ButtonTypeMap<{}, "button">>;
   classes: {
     readonly [key: string]: string;
   };
   setRoom: Dispatch<SetStateAction<Room>>;
-}> = ({ Button, TextField, user, classes, isLoggedIn, setRoom }) => {
+}> = ({ Button, TextField, classes, setRoom }) => {
   const roomNameRef = useRef<HTMLInputElement | undefined>();
   const usernameRef = useRef<HTMLInputElement | undefined>();
   const capacityRef = useRef<HTMLInputElement | undefined>();
@@ -28,16 +26,14 @@ const Settings: FC<{
   };
   return (
     <form className={classes.form} onSubmit={submitHandler}>
-      {!isLoggedIn || !user.isLoggedIn ? (
-        <TextField
-          className={classes.textField}
-          placeholder="enter username"
-          size="small"
-          type="text"
-          inputRef={usernameRef}
-          fullWidth
-        />
-      ) : null}
+      <TextField
+        className={classes.textField}
+        placeholder="enter username"
+        size="small"
+        type="text"
+        inputRef={usernameRef}
+        fullWidth
+      />
       <TextField
         className={classes.textField}
         placeholder="enter room name"
