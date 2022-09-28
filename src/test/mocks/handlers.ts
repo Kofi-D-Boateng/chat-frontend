@@ -5,7 +5,6 @@ import { CREATEROOM, FINDROOM } from "../../component/UI/Constatns";
 export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
   rest.get(FINDROOM, async (req, res, ctx) => {
     const param = req.url.searchParams.get("key");
-    console.log(param);
     if (!param) {
       return res(ctx.status(400));
     }

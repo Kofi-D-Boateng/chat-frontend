@@ -24,6 +24,7 @@ const CreateRoom: FC<{
   dispatch: Dispatch<any>;
 }> = ({ axios, nav, isMobile, user, dispatch }) => {
   const URL: string = ROOM.substring(0, 9);
+
   const [room, setRoom] = useState<Room>({
     name: "",
     creator: "",
