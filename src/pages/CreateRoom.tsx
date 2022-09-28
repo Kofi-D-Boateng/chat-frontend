@@ -22,9 +22,8 @@ const CreateRoom: FC<{
   isMobile: boolean;
   user: User;
   dispatch: Dispatch<any>;
-}> = ({ params, axios, nav, isMobile, user, dispatch }) => {
+}> = ({ axios, nav, isMobile, user, dispatch }) => {
   const URL: string = ROOM.substring(0, 9);
-  const isLoggedin: boolean = params.get("loggedIn") as unknown as boolean;
   const [room, setRoom] = useState<Room>({
     name: "",
     creator: "",
@@ -67,9 +66,7 @@ const CreateRoom: FC<{
           </Typography>
           <CardContent>
             <Settings
-              isLoggedIn={isLoggedin}
               classes={classes}
-              user={user}
               TextField={TextField}
               Button={Button}
               setRoom={setRoom}

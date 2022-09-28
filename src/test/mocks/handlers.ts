@@ -3,8 +3,12 @@ import { DefaultBodyType, MockedRequest, rest, RestHandler } from "msw";
 import { CREATEROOM, FINDROOM } from "../../component/UI/Constatns";
 
 export const handlers: RestHandler<MockedRequest<DefaultBodyType>>[] = [
-  rest.get(FINDROOM, (req, res, ctx) => {
-    console.log("HIT");
+  rest.get(FINDROOM, async (req, res, ctx) => {
+    const param = req.url.searchParams.get("key");
+    console.log(param);
+    if (!param) {
+      return res(ctx.status(400));
+    }
     return res(
       ctx.status(200),
       ctx.json({ roomName: randomBytes(12).toString("hex") })
