@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { AxiosStatic } from "axios";
-import { Dispatch, FC, useEffect, useState } from "react";
+import { Dispatch, FC, FormEvent, useRef } from "react";
 import { NavigateFunction } from "react-router-dom";
 import Settings from "../component/forms/create/Settings";
 import { CREATEROOM, ROOM } from "../component/UI/Constatns";
@@ -16,7 +16,6 @@ import classes from "../../src/styles/CreateRoomStyles.module.css";
 import { Room, User } from "../types/types";
 
 const CreateRoom: FC<{
-  params: URLSearchParams;
   axios: AxiosStatic;
   nav: NavigateFunction;
   isMobile: boolean;
@@ -24,39 +23,39 @@ const CreateRoom: FC<{
   dispatch: Dispatch<any>;
 }> = ({ axios, nav, isMobile, user, dispatch }) => {
   const URL: string = ROOM.substring(0, 9);
+  const roomNameRef = useRef<HTMLInputElement | undefined>();
+  const usernameRef = useRef<HTMLInputElement | undefined>();
+  const capacityRef = useRef<HTMLInputElement | undefined>();
+  const submitHandler: (e: FormEvent) => void = (e) => {
+    e.preventDefault();
+    const numberCheck = parseInt(capacityRef.current?.value as string);
+    if (
+      roomNameRef.current?.value === undefined ||
+      usernameRef.current?.value === undefined
+    )
+      return;
+    if (isNaN(numberCheck)) return;
 
-  const [room, setRoom] = useState<Room>({
-    name: "",
-    creator: "",
-    capacity: 0,
-  });
+    setRoom({
+      name: roomNameRef.current?.value as string,
+      creator: usernameRef.current?.value as string,
+      capacity: numberCheck,
+    });
+  };
 
-  useEffect(() => {
-    if (room.capacity === 0) return;
-    const fetchCreateRoom: (
-      createdRoom: Room,
-      axios: AxiosStatic,
-      nav: NavigateFunction
-    ) => void = async (room, axios, nav) => {
-      await axios
-        .post(CREATEROOM, room)
-        .then((response) => {
-          const { roomName, roomID, username } = response.data;
-          dispatch(
-            userActions.setUser({
-              isAdmin: true,
-              username: username,
-              token: user.token as string,
-              roomID: roomID,
-              socketID: user.socketID,
-            })
-          );
-          nav(`${URL}?room=${roomName}`, { replace: true });
-        })
-        .catch();
-    };
-    fetchCreateRoom(room, axios, nav);
-  }, [room, axios, nav, URL, dispatch, user.socketID, user.token]);
+  const setRoom: (data: Room) => void = async (data) => {
+    const result = await axios.post(CREATEROOM, data);
+    if (result.status < 200 || result.status > 204) return;
+    const { roomName, roomID, username } = result.data;
+    dispatch(
+      userActions.setUser({
+        username: username,
+        roomID: roomID,
+        socketID: user.socketID,
+      })
+    );
+    nav(`${URL}?room=${roomName}`, { replace: true });
+  };
 
   return (
     <Grid className={classes.mainContainer} container>
@@ -70,7 +69,10 @@ const CreateRoom: FC<{
               classes={classes}
               TextField={TextField}
               Button={Button}
-              setRoom={setRoom}
+              onSubmit={submitHandler}
+              username={usernameRef}
+              roomName={roomNameRef}
+              capacity={capacityRef}
             />
           </CardContent>
         </Grid>

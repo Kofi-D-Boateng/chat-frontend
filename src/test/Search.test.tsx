@@ -23,22 +23,20 @@ const theme = createTheme({
 });
 
 const USER: User = {
-  isAdmin: false,
-  isLoggedIn: false,
   roomID: "",
   socketID: "",
-  token: "",
   username: "",
 };
 
-const URLPARAMS: string[] = ["?roomID=testing%room"];
+const SUCCESFULPARAM: string[] = ["?roomID=testing%room"];
+const FAILUREPARAM: string[] = ["?roomID=failed%room"];
 
 describe("Search Page test suite", () => {
   beforeAll(() => {});
   test("Successful Room Search", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={URLPARAMS}>
+        <MemoryRouter initialEntries={SUCCESFULPARAM}>
           <Provider store={STORE}>
             <ThemeProvider theme={theme}>
               <Search
@@ -55,6 +53,33 @@ describe("Search Page test suite", () => {
     });
     const TextMatch = await screen.findByText(
       /Please enter a username/i,
+      {
+        exact: false,
+      },
+      { interval: 1500 }
+    );
+    await waitFor(() => expect(TextMatch).toBeInTheDocument);
+  });
+  test("Failure to find Room", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={FAILUREPARAM}>
+          <Provider store={STORE}>
+            <ThemeProvider theme={theme}>
+              <Search
+                isMobile={false}
+                axios={axios}
+                dispatch={useDispatch}
+                nav={useNavigate}
+                user={USER}
+              />
+            </ThemeProvider>
+          </Provider>
+        </MemoryRouter>
+      );
+    });
+    const TextMatch = await screen.findByText(
+      /Room was not found/i,
       {
         exact: false,
       },

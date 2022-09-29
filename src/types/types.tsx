@@ -3,10 +3,7 @@ import Peer from "simple-peer";
 import { Socket } from "socket.io-client";
 
 export type User = {
-  token: string | null;
-  isAdmin: boolean;
   roomID: string | null;
-  isLoggedIn: boolean;
   username: string | null;
   socketID: string | null;
 };
