@@ -47,11 +47,9 @@ const Search: FC<{
     e.preventDefault();
     dispatch(
       userActions.setUser({
-        isAdmin: false,
         roomID: roomID,
         socketID: user.socketID,
         username: usernameRef.current?.value as string,
-        token: user.token as string,
       })
     );
     nav(`${URL}?room=${roomName}`, { replace: true });

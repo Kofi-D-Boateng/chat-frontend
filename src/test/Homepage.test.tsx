@@ -77,11 +77,11 @@ describe("Homepage test suite", () => {
     userEvent.click(joinRoomBtn);
     expect(joinRoomBtn).not.toBeInTheDocument;
     const TextMatch = screen.findByText(
-      /Room was not found/i,
+      /Welcome to Hangout/i,
       {
         exact: false,
       },
-      { interval: 1500 }
+      { interval: 3500 }
     );
     await waitFor(() => expect(TextMatch).toBeInTheDocument);
   });

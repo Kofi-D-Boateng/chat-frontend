@@ -1,7 +1,6 @@
-import { Dispatch, FC, Suspense, lazy } from "react";
+import { FC, Suspense, lazy } from "react";
 import {
   Navigate,
-  NavigateFunction,
   Route,
   Routes,
   useNavigate,
@@ -18,7 +17,7 @@ import Layout from "./component/UI/Layout/Layout";
 import { User } from "./types/types";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./store/store";
-import { Theme, useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
 import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
 const Homepage = lazy(() => import("./pages/Homepage"));
@@ -28,11 +27,8 @@ const CreateRoom = lazy(() => import("./pages/CreateRoom"));
 
 const App: FC = () => {
   const USER: User = useSelector((state: RootState) => state.user);
-  const theme: Theme = useTheme();
-  const isMobile: boolean = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile: boolean = useMediaQuery(useTheme().breakpoints.down("md"));
   const [params] = useSearchParams();
-  const dispatch: Dispatch<any> = useDispatch();
-  const navigation: NavigateFunction = useNavigate();
 
   return (
     <Suspense fallback={<LoadingSpinner />}>
@@ -41,7 +37,11 @@ const App: FC = () => {
           <Route
             path={HOMEPAGE}
             element={
-              <Homepage isMobile={isMobile} axios={axios} dispatch={dispatch} />
+              <Homepage
+                isMobile={isMobile}
+                axios={axios}
+                dispatch={useDispatch()}
+              />
             }
           />
           <Route
@@ -49,8 +49,8 @@ const App: FC = () => {
             element={
               <Search
                 axios={axios}
-                dispatch={dispatch}
-                nav={navigation}
+                dispatch={useDispatch()}
+                nav={useNavigate()}
                 isMobile={isMobile}
                 user={USER}
               />
@@ -61,8 +61,8 @@ const App: FC = () => {
             element={
               <Room
                 isMobile={isMobile}
-                nav={navigation}
-                dispatch={dispatch}
+                nav={useNavigate()}
+                dispatch={useDispatch()}
                 param={params}
                 myInfo={USER}
               />
@@ -72,10 +72,9 @@ const App: FC = () => {
             path={SETUPROOM}
             element={
               <CreateRoom
-                params={params}
-                dispatch={dispatch}
                 axios={axios}
-                nav={navigation}
+                nav={useNavigate()}
+                dispatch={useDispatch()}
                 isMobile={isMobile}
                 user={USER}
               />

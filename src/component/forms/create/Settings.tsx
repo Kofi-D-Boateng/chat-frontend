@@ -1,6 +1,5 @@
 import { ButtonTypeMap, ExtendButtonBase, TextFieldProps } from "@mui/material";
-import { Dispatch, FC, FormEvent, SetStateAction, useRef } from "react";
-import { Room } from "../../../types/types";
+import { FC, FormEvent, MutableRefObject } from "react";
 
 const Settings: FC<{
   TextField: (props: TextFieldProps) => JSX.Element;
@@ -8,30 +7,28 @@ const Settings: FC<{
   classes: {
     readonly [key: string]: string;
   };
-  setRoom: Dispatch<SetStateAction<Room>>;
-}> = ({ Button, TextField, classes, setRoom }) => {
-  const roomNameRef = useRef<HTMLInputElement | undefined>();
-  const usernameRef = useRef<HTMLInputElement | undefined>();
-  const capacityRef = useRef<HTMLInputElement | undefined>();
-  const submitHandler: (e: FormEvent) => void = (e) => {
-    e.preventDefault();
-    const numberCheck = parseInt(capacityRef.current?.value as string);
-    if (!roomNameRef.current?.value || !usernameRef.current?.value) return;
-
-    setRoom({
-      name: roomNameRef.current?.value as string,
-      creator: usernameRef.current?.value as string,
-      capacity: numberCheck,
-    });
-  };
+  onSubmit: (e: FormEvent) => void;
+  username: MutableRefObject<HTMLInputElement | undefined>;
+  roomName: MutableRefObject<HTMLInputElement | undefined>;
+  capacity: MutableRefObject<HTMLInputElement | undefined>;
+}> = ({
+  Button,
+  TextField,
+  classes,
+  onSubmit,
+  capacity,
+  roomName,
+  username,
+}) => {
   return (
-    <form className={classes.form} onSubmit={submitHandler}>
+    <form className={classes.form} onSubmit={onSubmit}>
       <TextField
         className={classes.textField}
         placeholder="enter username"
         size="small"
         type="text"
-        inputRef={usernameRef}
+        inputRef={username}
+        required
         fullWidth
       />
       <TextField
@@ -39,7 +36,8 @@ const Settings: FC<{
         placeholder="enter room name"
         size="small"
         type="text"
-        inputRef={roomNameRef}
+        inputRef={roomName}
+        required
         fullWidth
       />
       <TextField
@@ -47,7 +45,8 @@ const Settings: FC<{
         placeholder="enter capacity"
         size="small"
         type="number"
-        inputRef={capacityRef}
+        inputRef={capacity}
+        required
         fullWidth
       />
       <Button
