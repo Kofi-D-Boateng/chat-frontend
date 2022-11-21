@@ -2,12 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../../types/types";
 
 function initialState(): User {
-  const roomID: string | null = sessionStorage.getItem("roomID");
+  const roomId: string | null = sessionStorage.getItem("roomId");
   const username: string | null = sessionStorage.getItem("usernamne");
   return {
-    roomID: roomID,
+    roomId: roomId,
     username: username,
-    socketID: null,
   };
 }
 
@@ -18,10 +17,10 @@ const userSlice = createSlice({
     setRoom(
       state,
       action: PayloadAction<{
-        roomID: string | undefined;
+        roomId: string | undefined;
       }>
     ) {
-      state.roomID = action.payload.roomID as string;
+      state.roomId = action.payload.roomId as string;
     },
     login(
       state,
@@ -35,24 +34,19 @@ const userSlice = createSlice({
       state,
       action: PayloadAction<{
         username: string | null;
-        roomID: string | null;
-        socketID: string | null;
+        roomId: string | null;
       }>
     ) {
       state.username = state.username?.trim()
         ? state.username
         : action.payload.username;
-      state.roomID = state.roomID?.trim()
-        ? state.roomID
-        : action.payload.roomID;
-      state.socketID = state.socketID?.trim()
-        ? state.socketID
-        : action.payload.socketID;
-      sessionStorage.setItem("roomID", state.roomID as string);
+      state.roomId = state.roomId?.trim()
+        ? state.roomId
+        : action.payload.roomId;
+      sessionStorage.setItem("roomId", state.roomId as string);
       sessionStorage.setItem("username", state.username as string);
     },
     clearUser(state) {
-      state.socketID = null;
       state.username = null;
       sessionStorage.clear();
     },

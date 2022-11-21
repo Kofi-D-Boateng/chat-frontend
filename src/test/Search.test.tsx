@@ -23,8 +23,7 @@ const theme = createTheme({
 });
 
 const USER: User = {
-  roomID: "",
-  socketID: "",
+  roomId: "",
   username: "",
 };
 
