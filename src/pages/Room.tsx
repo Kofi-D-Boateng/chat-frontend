@@ -53,7 +53,7 @@ const Room: FC<{
         userVideo.current.srcObject = stream;
 
         socket.current?.emit("join-room", {
-          roomID: myInfo.roomID,
+          roomId: myInfo.roomId,
           username: myInfo.username as string,
         });
         socket.current?.on("room-status", (data) => {
@@ -76,7 +76,7 @@ const Room: FC<{
                 userToSignal: user.id,
                 myID: socket.current?.id as string,
                 stream: stream,
-                roomID: myInfo.roomID as string,
+                roomId: myInfo.roomId as string,
                 socket: socket,
               });
               peersRef.current.push({ peerID: user.id, instance: peer });
@@ -134,6 +134,7 @@ const Room: FC<{
         socket.current?.on(
           "chat",
           async (data: { message: string; id: string; sender: string }) => {
+            console.log(data);
             const { message, id, sender } = data;
             const timestamp = new Date().toLocaleTimeString();
             const messageObject: Messages = {
@@ -206,7 +207,7 @@ const Room: FC<{
   };
 
   const linkHandler = () => {
-    navigator.clipboard.writeText(myInfo.roomID as string).then(() => {
+    navigator.clipboard.writeText(myInfo.roomId as string).then(() => {
       setView(true);
       setTimeout(() => {
         setView(false);
@@ -217,7 +218,7 @@ const Room: FC<{
   const chatHandler = async (data: MessageData) => {
     const { message, id } = data;
     const messageDatagram: MessageDatagram = {
-      room: myInfo.roomID as string,
+      room: myInfo.roomId as string,
       user: {
         id: id,
         username: myInfo.username as string,
@@ -243,8 +244,10 @@ const Room: FC<{
 
   const roomExit = () => {
     dispatch(userActions.clearUser());
+    const src: MediaStream = userVideo.current.srcObject;
+    src.getTracks().forEach((track) => track.stop());
     socket.current?.emit("leave", {
-      room: myInfo.roomID,
+      room: myInfo.roomId,
       user: {
         position: positionRef.current,
         id: socket.current.id,

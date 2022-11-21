@@ -30,7 +30,7 @@ const Search: FC<{
       n: NavigateFunction
     ) => void = async (axios, room, nav) => {
       await axios
-        .get(FINDROOM, { params: { key: room } })
+        .get(`http://localhost:7000${FINDROOM}`, { params: { key: room } })
         .then(() => {
           setResult(200);
         })
@@ -47,12 +47,11 @@ const Search: FC<{
     e.preventDefault();
     dispatch(
       userActions.setUser({
-        roomID: roomID,
-        socketID: user.socketID,
+        roomId: roomID,
         username: usernameRef.current?.value as string,
       })
     );
-    nav(`${URL}?room=${roomName}`, { replace: true });
+    nav(`${URL}/${roomName}`, { replace: true });
   };
   return (
     <Grid container>

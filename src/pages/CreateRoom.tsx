@@ -44,17 +44,16 @@ const CreateRoom: FC<{
   };
 
   const setRoom: (data: Room) => void = async (data) => {
-    const result = await axios.post(CREATEROOM, data);
+    const result = await axios.post(`http://localhost:7000${CREATEROOM}`, data);
     if (result.status < 200 || result.status > 204) return;
-    const { roomName, roomID, username } = result.data;
+    const { roomID } = result.data;
     dispatch(
       userActions.setUser({
-        username: username,
-        roomID: roomID,
-        socketID: user.socketID,
+        username: usernameRef.current?.value as string,
+        roomId: roomID,
       })
     );
-    nav(`${URL}?room=${roomName}`, { replace: true });
+    nav(`${URL}/${roomNameRef.current?.value}`, { replace: true });
   };
 
   return (

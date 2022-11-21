@@ -20,7 +20,7 @@ export const createPeer = (data: createPeerData) => {
     data.socket.current?.emit(SENDINGSIGNAL, {
       userToSignal: data.userToSignal,
       callerID: data.myID,
-      roomID: data.roomID,
+      roomID: data.roomId,
       signal,
     });
   });

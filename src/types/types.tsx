@@ -3,9 +3,8 @@ import Peer from "simple-peer";
 import { Socket } from "socket.io-client";
 
 export type User = {
-  roomID: string | null;
+  roomId: string | null;
   username: string | null;
-  socketID: string | null;
 };
 
 export type Video = {
@@ -68,7 +67,7 @@ export type addPeerData = {
 export type createPeerData = {
   myID: string;
   userToSignal: string;
-  roomID: string;
+  roomId: string;
   stream: MediaStream;
   socket: MutableRefObject<Socket | undefined>;
 };
