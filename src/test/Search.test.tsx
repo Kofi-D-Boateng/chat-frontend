@@ -1,8 +1,7 @@
 import { createTheme, ThemeProvider } from "@mui/material";
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { Provider, useDispatch } from "react-redux";
-import axios from "axios";
-import { MemoryRouter, useNavigate } from "react-router-dom";
+import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router-dom";
 import Search from "../pages/Search";
 import { STORE } from "../store/store";
 import { User } from "../types/types";
@@ -27,8 +26,8 @@ const USER: User = {
   username: "",
 };
 
-const SUCCESFULPARAM: string[] = ["?roomID=testing%room"];
-const FAILUREPARAM: string[] = ["?roomID=failed%room"];
+const SUCCESFULPARAM: string[] = ["?roomId=testing%room"];
+const FAILUREPARAM: string[] = ["?roomId=failed%room"];
 
 describe("Search Page test suite", () => {
   beforeAll(() => {});
@@ -38,13 +37,7 @@ describe("Search Page test suite", () => {
         <MemoryRouter initialEntries={SUCCESFULPARAM}>
           <Provider store={STORE}>
             <ThemeProvider theme={theme}>
-              <Search
-                isMobile={false}
-                axios={axios}
-                dispatch={useDispatch}
-                nav={useNavigate}
-                user={USER}
-              />
+              <Search isMobile={false} user={USER} />
             </ThemeProvider>
           </Provider>
         </MemoryRouter>
@@ -65,13 +58,7 @@ describe("Search Page test suite", () => {
         <MemoryRouter initialEntries={FAILUREPARAM}>
           <Provider store={STORE}>
             <ThemeProvider theme={theme}>
-              <Search
-                isMobile={false}
-                axios={axios}
-                dispatch={useDispatch}
-                nav={useNavigate}
-                user={USER}
-              />
+              <Search isMobile={false} user={USER} />
             </ThemeProvider>
           </Provider>
         </MemoryRouter>

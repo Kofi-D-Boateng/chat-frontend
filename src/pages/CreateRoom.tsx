@@ -6,26 +6,26 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { AxiosStatic } from "axios";
-import { Dispatch, FC, FormEvent, useRef } from "react";
-import { NavigateFunction } from "react-router-dom";
+import axios from "axios";
+import { FC, FormEvent, useRef } from "react";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 import Settings from "../component/forms/create/Settings";
 import { CREATEROOM, ROOM } from "../component/UI/Constatns";
 import { userActions } from "../store/user/user-slice";
 import classes from "../../src/styles/CreateRoomStyles.module.css";
-import { Room, User } from "../types/types";
+import { Room } from "../types/types";
+import { useDispatch } from "react-redux";
 
 const CreateRoom: FC<{
-  axios: AxiosStatic;
-  nav: NavigateFunction;
   isMobile: boolean;
-  user: User;
-  dispatch: Dispatch<any>;
-}> = ({ axios, nav, isMobile, user, dispatch }) => {
+}> = ({ isMobile }) => {
   const URL: string = ROOM.substring(0, 9);
   const roomNameRef = useRef<HTMLInputElement | undefined>();
   const usernameRef = useRef<HTMLInputElement | undefined>();
   const capacityRef = useRef<HTMLInputElement | undefined>();
+  const nav = useNavigate();
+  const dispatch = useDispatch();
+
   const submitHandler: (e: FormEvent) => void = (e) => {
     e.preventDefault();
     const numberCheck = parseInt(capacityRef.current?.value as string);
@@ -44,7 +44,7 @@ const CreateRoom: FC<{
   };
 
   const setRoom: (data: Room) => void = async (data) => {
-    const result = await axios.post(`http://localhost:7000${CREATEROOM}`, data);
+    const result = await axios.post(`${CREATEROOM}`, data);
     if (result.status < 200 || result.status > 204) return;
     const { roomID } = result.data;
     dispatch(

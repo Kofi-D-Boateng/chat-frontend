@@ -1,11 +1,9 @@
 import {
   ButtonTypeMap,
-  CardTypeMap,
   ExtendButtonBase,
   TextFieldProps,
   Typography,
 } from "@mui/material";
-import { OverridableComponent } from "@mui/material/OverridableComponent";
 import { FC, FormEvent, MutableRefObject } from "react";
 
 const UserJoinForm: FC<{
@@ -17,10 +15,9 @@ const UserJoinForm: FC<{
   submit: (e: FormEvent<HTMLFormElement>) => void;
   isMobile: boolean;
   Button: ExtendButtonBase<ButtonTypeMap<{}, "button">>;
-  Card: OverridableComponent<CardTypeMap<{}, "div">>;
-}> = ({ username, TextField, submit, Button, Card, classes, isMobile }) => {
+}> = ({ username, TextField, submit, Button, classes, isMobile }) => {
   return (
-    <Card className={!isMobile ? classes.card : classes.mobCard}>
+    <>
       <div className={classes.titleContainer}>
         <Typography variant="h6">Please enter a username</Typography>
       </div>
@@ -42,7 +39,7 @@ const UserJoinForm: FC<{
           Join
         </Button>
       </form>
-    </Card>
+    </>
   );
 };
 

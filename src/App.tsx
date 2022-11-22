@@ -1,11 +1,5 @@
 import { FC, Suspense, lazy } from "react";
-import {
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import {
   HOMEPAGE,
   REDIRECT,
@@ -15,10 +9,9 @@ import {
 } from "./component/UI/Constatns";
 import Layout from "./component/UI/Layout/Layout";
 import { User } from "./types/types";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "./store/store";
 import { useMediaQuery, useTheme } from "@mui/material";
-import axios from "axios";
 import LoadingSpinner from "./component/UI/LoadingSpinner";
 const Homepage = lazy(() => import("./pages/Homepage"));
 const Room = lazy(() => import("./pages/Room"));
@@ -34,51 +27,18 @@ const App: FC = () => {
     <Suspense fallback={<LoadingSpinner />}>
       <Layout>
         <Routes>
-          <Route
-            path={HOMEPAGE}
-            element={
-              <Homepage
-                isMobile={isMobile}
-                axios={axios}
-                dispatch={useDispatch()}
-              />
-            }
-          />
+          <Route path={HOMEPAGE} element={<Homepage isMobile={isMobile} />} />
           <Route
             path={SEARCH}
-            element={
-              <Search
-                axios={axios}
-                dispatch={useDispatch()}
-                nav={useNavigate()}
-                isMobile={isMobile}
-                user={USER}
-              />
-            }
+            element={<Search isMobile={isMobile} user={USER} />}
           />
           <Route
             path={ROOM}
-            element={
-              <Room
-                isMobile={isMobile}
-                nav={useNavigate()}
-                dispatch={useDispatch()}
-                param={params}
-                myInfo={USER}
-              />
-            }
+            element={<Room isMobile={isMobile} param={params} />}
           />
           <Route
             path={SETUPROOM}
-            element={
-              <CreateRoom
-                axios={axios}
-                nav={useNavigate()}
-                dispatch={useDispatch()}
-                isMobile={isMobile}
-                user={USER}
-              />
-            }
+            element={<CreateRoom isMobile={isMobile} />}
           />
           <Route path={REDIRECT} element={<Navigate replace to={HOMEPAGE} />} />
         </Routes>
