@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { FC, FormEvent, useRef } from "react";
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Settings from "../component/forms/create/Settings";
 import { CREATEROOM, ROOM } from "../component/UI/Constatns";
 import { userActions } from "../store/user/user-slice";

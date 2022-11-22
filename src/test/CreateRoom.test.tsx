@@ -1,12 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import axios from "axios";
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import { STORE } from "../store/store";
 import { createTheme, ThemeProvider } from "@mui/material";
-import { BrowserRouter, useNavigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import CreateRoom from "../pages/CreateRoom";
-import { User } from "../types/types";
 
 const theme = createTheme({
   typography: {
@@ -22,10 +20,6 @@ const theme = createTheme({
     },
   },
 });
-const USER: User = {
-  roomId: "",
-  username: "",
-};
 
 const createRoomInfo = {
   name: "Kofi Boateng",
@@ -39,13 +33,7 @@ describe("Create Room Suite", () => {
       <Provider store={STORE}>
         <ThemeProvider theme={theme}>
           <BrowserRouter>
-            <CreateRoom
-              isMobile={false}
-              axios={axios}
-              dispatch={useDispatch}
-              nav={useNavigate}
-              user={USER}
-            />
+            <CreateRoom isMobile={false} />
           </BrowserRouter>
         </ThemeProvider>
       </Provider>
@@ -68,13 +56,7 @@ describe("Create Room Suite", () => {
       <Provider store={STORE}>
         <ThemeProvider theme={theme}>
           <BrowserRouter>
-            <CreateRoom
-              isMobile={false}
-              axios={axios}
-              dispatch={useDispatch}
-              nav={useNavigate}
-              user={USER}
-            />
+            <CreateRoom isMobile={false} />
           </BrowserRouter>
         </ThemeProvider>
       </Provider>
