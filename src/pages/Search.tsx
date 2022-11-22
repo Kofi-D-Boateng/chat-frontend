@@ -1,25 +1,36 @@
-import { Button, Card, Grid, TextField, Typography } from "@mui/material";
-import { AxiosStatic } from "axios";
-import { Dispatch, FC, FormEvent, useEffect, useRef, useState } from "react";
-import { NavigateFunction, useSearchParams } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
+import axios, { AxiosStatic } from "axios";
+import { FC, FormEvent, useEffect, useRef, useState } from "react";
+import {
+  NavigateFunction,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import UserJoinForm from "../component/forms/userJoin/UserJoinForm";
 import { FINDROOM, REDIRECT, ROOM } from "../component/UI/Constatns";
-import LoadingSpinner from "../component/UI/LoadingSpinner";
 import { userActions } from "../store/user/user-slice";
 import { User } from "../types/types";
 import classes from "../../src/styles/SearchStyles.module.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 
 const Search: FC<{
-  axios: AxiosStatic;
-  dispatch: Dispatch<any>;
-  nav: NavigateFunction;
   isMobile: boolean;
   user: User;
-}> = ({ axios, dispatch, nav, user, isMobile }) => {
+}> = ({ isMobile }) => {
+  const nav = useNavigate();
+  const dispatch = useDispatch();
   const roomName: string = useSelector((state: RootState) => state.room.name);
-  const roomID: string | null = useSearchParams()[0].get("roomID");
+  const roomID: string | null = useSearchParams()[0].get("roomId");
   const [result, setResult] = useState<number>(0);
   const usernameRef = useRef<HTMLInputElement>();
   const URL: string = ROOM.substring(0, 9);
@@ -27,10 +38,10 @@ const Search: FC<{
     const findRoomStatus: (
       axios: AxiosStatic,
       room: string,
-      n: NavigateFunction
+      nav: NavigateFunction
     ) => void = async (axios, room, nav) => {
       await axios
-        .get(`http://localhost:7000${FINDROOM}`, { params: { key: room } })
+        .get(`${FINDROOM}`, { params: { key: room } })
         .then(() => {
           setResult(200);
         })
@@ -42,7 +53,7 @@ const Search: FC<{
         });
     };
     findRoomStatus(axios, roomID as string, nav);
-  }, [axios, dispatch, nav, roomID]);
+  }, [dispatch, nav, roomID]);
   const submitHandler: (e: FormEvent<HTMLFormElement>) => void = (e) => {
     e.preventDefault();
     dispatch(
@@ -54,30 +65,47 @@ const Search: FC<{
     nav(`${URL}/${roomName}`, { replace: true });
   };
   return (
-    <Grid container>
-      {result === 0 ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          {result === 200 ? (
-            <UserJoinForm
-              isMobile={isMobile}
-              classes={classes}
-              username={usernameRef}
-              Card={Card}
-              TextField={TextField}
-              Button={Button}
-              submit={submitHandler}
-            />
+    <Grid className={classes.mainContainer} container>
+      <Card className={!isMobile ? classes.card : classes.mobCard}>
+        <div className={classes.cardHeader}>
+          <p>Welcome to Hangout!</p>
+        </div>
+        <CardContent>
+          {result === 0 ? (
+            <Box>
+              <CircularProgress
+                sx={{
+                  margin: "100px auto",
+                  position: "relative",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%,-50%)",
+                  width: "50%",
+                }}
+              />
+            </Box>
           ) : (
-            <Grid className={classes.error} container>
-              <Typography sx={{ margin: "center" }} variant="h5">
-                Room was not found!
-              </Typography>
-            </Grid>
+            <>
+              {result === 200 ? (
+                <UserJoinForm
+                  isMobile={isMobile}
+                  classes={classes}
+                  username={usernameRef}
+                  TextField={TextField}
+                  Button={Button}
+                  submit={submitHandler}
+                />
+              ) : (
+                <Grid className={classes.error} container>
+                  <Typography sx={{ margin: "auto" }} variant="h5">
+                    Room was not found!
+                  </Typography>
+                </Grid>
+              )}
+            </>
           )}
-        </>
-      )}
+        </CardContent>
+      </Card>
     </Grid>
   );
 };

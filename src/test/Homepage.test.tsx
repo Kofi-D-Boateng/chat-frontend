@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import axios from "axios";
-import { Provider, useDispatch } from "react-redux";
+import { Provider } from "react-redux";
 import { STORE } from "../store/store";
 import Homepage from "../pages/Homepage";
 import { createTheme, ThemeProvider } from "@mui/material";
@@ -29,7 +28,7 @@ describe("Homepage test suite", () => {
       <Provider store={STORE}>
         <ThemeProvider theme={theme}>
           <BrowserRouter>
-            <Homepage isMobile={false} axios={axios} dispatch={useDispatch} />
+            <Homepage isMobile={false} />
           </BrowserRouter>
         </ThemeProvider>
       </Provider>
@@ -46,7 +45,7 @@ describe("Homepage test suite", () => {
       <Provider store={STORE}>
         <ThemeProvider theme={theme}>
           <BrowserRouter>
-            <Homepage isMobile={false} axios={axios} dispatch={useDispatch} />
+            <Homepage isMobile={false} />
           </BrowserRouter>
         </ThemeProvider>
       </Provider>
@@ -63,7 +62,7 @@ describe("Homepage test suite", () => {
       <Provider store={STORE}>
         <ThemeProvider theme={theme}>
           <BrowserRouter>
-            <Homepage isMobile={false} axios={axios} dispatch={useDispatch} />
+            <Homepage isMobile={false} />
           </BrowserRouter>
         </ThemeProvider>
       </Provider>

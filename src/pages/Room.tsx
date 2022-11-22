@@ -1,7 +1,7 @@
 import { Grid, Paper, Typography } from "@mui/material";
-import { Dispatch, FC, ForwardedRef, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { NavigateFunction } from "react-router-dom";
+import { FC, ForwardedRef, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { connect, Socket } from "socket.io-client";
 import Peer from "simple-peer";
 import { RootState } from "../store/store";
@@ -11,7 +11,6 @@ import {
   MessageDatagram,
   Messages,
   Participant,
-  User,
 } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
@@ -29,12 +28,11 @@ import LinkCopyMessage from "../component/UI/Modal/LinkCopyMessage";
 
 const Room: FC<{
   isMobile: boolean;
-  nav: NavigateFunction;
-  dispatch: Dispatch<any>;
   param: URLSearchParams;
-  myInfo: User;
-}> = ({ isMobile, nav, dispatch }) => {
+}> = ({ isMobile }) => {
   const myInfo = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
+  const nav = useNavigate();
   const [view, setView] = useState<boolean>(false);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Participant[]>([]);

@@ -1,3 +1,12 @@
+.mainContainer {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../assets/galaxy.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  min-height: 100vh;
+}
+
 .card {
   width: 40%;
   border: 1px solid black;
@@ -18,10 +27,18 @@
   transform: translate(-50%, -50%);
 }
 
+.cardHeader {
+  background-color: purple;
+  border-bottom: 0.5px solid black;
+  font-size: 2rem;
+  padding: 15px 0;
+  text-align: center;
+  color: white;
+}
+
 .error {
-  width: 30%;
-  margin: auto;
-  position: absolute;
+  margin: 100px auto;
+  position: relative;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
