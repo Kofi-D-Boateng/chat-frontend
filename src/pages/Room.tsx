@@ -41,7 +41,6 @@ const Room: FC<{
   const userVideo: ForwardedRef<any> = useRef();
   const peersRef = useRef<{ peerID: string; instance: Peer.Instance }[]>([]);
   const positionRef = useRef<number>(0);
-  console.log(myInfo);
 
   useEffect(() => {
     socket.current = connect(SOCKETURI);
@@ -132,7 +131,6 @@ const Room: FC<{
         socket.current?.on(
           "chat",
           async (data: { message: string; id: string; sender: string }) => {
-            console.log(data);
             const { message, id, sender } = data;
             const timestamp = new Date().toLocaleTimeString();
             const messageObject: Messages = {
