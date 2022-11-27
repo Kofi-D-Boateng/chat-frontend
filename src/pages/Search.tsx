@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios, { AxiosStatic } from "axios";
-import { FC, FormEvent, useEffect, useRef, useState } from "react";
+import { FC, FormEvent, useEffect, useRef } from "react";
 import {
   NavigateFunction,
   useNavigate,
@@ -30,8 +30,9 @@ const Search: FC<{
   const nav = useNavigate();
   const dispatch = useDispatch();
   const roomName: string = useSelector((state: RootState) => state.room.name);
-  const roomID: string | null = useSearchParams()[0].get("roomId");
-  const [result, setResult] = useState<number>(0);
+  const params = useSearchParams()[0];
+  const roomIdParam: string | null = params.get("roomId");
+  const resultParam: string | null = params.get("valid");
   const usernameRef = useRef<HTMLInputElement>();
   const URL: string = ROOM.substring(0, 9);
   useEffect(() => {
@@ -43,22 +44,22 @@ const Search: FC<{
       await axios
         .get(`${FINDROOM}`, { params: { key: room } })
         .then(() => {
-          setResult(200);
+          nav("?valid=true", { replace: true });
         })
         .catch(() => {
-          setResult(400);
+          nav("?valid=false", { replace: true });
           setTimeout(() => {
             nav(REDIRECT, { replace: true });
           }, 2000);
         });
     };
-    findRoomStatus(axios, roomID as string, nav);
-  }, [dispatch, nav, roomID]);
+    findRoomStatus(axios, roomIdParam as string, nav);
+  }, [dispatch, nav, roomIdParam]);
   const submitHandler: (e: FormEvent<HTMLFormElement>) => void = (e) => {
     e.preventDefault();
     dispatch(
       userActions.setUser({
-        roomId: roomID,
+        roomId: roomIdParam,
         username: usernameRef.current?.value as string,
       })
     );
@@ -68,10 +69,15 @@ const Search: FC<{
     <Grid className={classes.mainContainer} container>
       <Card className={!isMobile ? classes.card : classes.mobCard}>
         <div className={classes.cardHeader}>
-          <p>Welcome to Hangout!</p>
+          {roomIdParam && (
+            <Typography variant="h6">Please enter a username</Typography>
+          )}
+          {resultParam && (
+            <Typography variant="h6">Welcome to Hangout!</Typography>
+          )}
         </div>
         <CardContent>
-          {result === 0 ? (
+          {roomIdParam && (
             <Box>
               <CircularProgress
                 sx={{
@@ -84,25 +90,23 @@ const Search: FC<{
                 }}
               />
             </Box>
-          ) : (
-            <>
-              {result === 200 ? (
-                <UserJoinForm
-                  isMobile={isMobile}
-                  classes={classes}
-                  username={usernameRef}
-                  TextField={TextField}
-                  Button={Button}
-                  submit={submitHandler}
-                />
-              ) : (
-                <Grid className={classes.error} container>
-                  <Typography sx={{ margin: "auto" }} variant="h5">
-                    Room was not found!
-                  </Typography>
-                </Grid>
-              )}
-            </>
+          )}
+          {resultParam && resultParam === "true" && (
+            <UserJoinForm
+              isMobile={isMobile}
+              classes={classes}
+              username={usernameRef}
+              TextField={TextField}
+              Button={Button}
+              submit={submitHandler}
+            />
+          )}
+          {resultParam && resultParam === "false" && (
+            <Grid className={classes.error} container>
+              <Typography sx={{ margin: "auto" }} variant="h5">
+                Room was not found!
+              </Typography>
+            </Grid>
           )}
         </CardContent>
       </Card>
