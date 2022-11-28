@@ -67,7 +67,7 @@ const ChatBox: FC<{
       {isMobile || hideText ? null : (
         <Grid className={classes.chatBox} md={3} item>
           <Grid xs={12} md={12} className={classes.title} item>
-            <Typography variant="h6">Chat</Typography>
+            <Typography variant="body1">STREAM CHAT</Typography>
           </Grid>
           <Grid className={classes.chat} xs={12} md={12} item>
             {msgs.map((map, index) => {

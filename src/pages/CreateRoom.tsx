@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 const CreateRoom: FC<{
   isMobile: boolean;
 }> = ({ isMobile }) => {
-  const URL: string = ROOM.substring(0, 9);
+  const URL: string = ROOM.substring(0, 8);
   const roomNameRef = useRef<HTMLInputElement | undefined>();
   const usernameRef = useRef<HTMLInputElement | undefined>();
   const capacityRef = useRef<HTMLInputElement | undefined>();

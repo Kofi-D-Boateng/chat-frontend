@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Room } from "../../types/types";
-
+const roomName = localStorage.getItem("roomName");
 function initialState(): Room {
   return {
-    name: "",
+    name: roomName ? roomName : "",
     creator: "",
     capacity: 0,
   };
@@ -13,14 +13,15 @@ const roomSlice = createSlice({
   name: "room",
   initialState: initialState(),
   reducers: {
-    createRoom(state, action: PayloadAction<Room>) {
+    setRoom(state, action: PayloadAction<Room>) {
       state.name = action.payload.name;
       state.creator = action.payload.creator;
       state.capacity = action.payload.capacity;
+      localStorage.setItem("roomName", action.payload.name);
     },
-    getRoomName(state, action: PayloadAction<{ name: string }>) {
-      state.name = action.payload.name;
-      sessionStorage.setItem("roomName", state.name);
+    setRoomName(state, action: PayloadAction<string>) {
+      state.name = action.payload;
+      localStorage.setItem("roomName", action.payload);
     },
   },
 });

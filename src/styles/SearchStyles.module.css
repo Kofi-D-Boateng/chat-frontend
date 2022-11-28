@@ -9,7 +9,7 @@
 
 .card {
   width: 40%;
-  border: 1px solid black;
+  border: 0.5px solid black;
   margin: auto;
   position: absolute;
   top: 50%;
@@ -19,7 +19,7 @@
 
 .mobCard {
   width: 80%;
-  border: 1px solid black;
+  border: 0.5px solid black;
   margin: auto;
   position: absolute;
   top: 50%;
@@ -46,7 +46,7 @@
 
 .btn {
   color: green;
-  border: green;
+  border-color: green;
   transition-duration: 400ms;
   text-transform: none;
   transition-property: all;
@@ -54,7 +54,7 @@
 
 .btn:hover {
   color: white;
-  border: green;
+  border-color: green;
   background: green;
 }
 
@@ -64,6 +64,10 @@
   text-align: center;
   background-color: purple;
   color: white;
+}
+
+.input {
+  margin: 30px auto;
 }
 
 .input:focus {
