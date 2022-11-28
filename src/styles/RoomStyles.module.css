@@ -51,11 +51,10 @@
   background-color: black;
   position: relative;
   min-height: 100vh;
-  border: #1a1a1a solid 1px;
 }
 
 .video {
-  width: 350px;
+  width: 400px;
 }
 
 .backgroundContainer {
@@ -76,7 +75,7 @@
   background-color: #1a1a1a;
   bottom: 0;
   width: 100%;
-  padding: 10px 0;
+  padding: 7.5px 0;
   position: absolute;
 }
 

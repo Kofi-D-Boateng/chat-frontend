@@ -22,6 +22,7 @@ import { User } from "../types/types";
 import classes from "../../src/styles/SearchStyles.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { roomActions } from "../store/room/room-slice";
 
 const Search: FC<{
   isMobile: boolean;
@@ -32,28 +33,37 @@ const Search: FC<{
   const roomName: string = useSelector((state: RootState) => state.room.name);
   const params = useSearchParams()[0];
   const roomIdParam: string | null = params.get("roomId");
-  const resultParam: string | null = params.get("valid");
+  const resultParam: string | null = params.get("result");
   const usernameRef = useRef<HTMLInputElement>();
-  const URL: string = ROOM.substring(0, 9);
+  const URL: string = ROOM.substring(0, 8);
   useEffect(() => {
-    const findRoomStatus: (
-      axios: AxiosStatic,
-      room: string,
-      nav: NavigateFunction
-    ) => void = async (axios, room, nav) => {
-      await axios
-        .get(`${FINDROOM}`, { params: { key: room } })
-        .then(() => {
-          nav("?valid=true", { replace: true });
-        })
-        .catch(() => {
-          nav("?valid=false", { replace: true });
-          setTimeout(() => {
-            nav(REDIRECT, { replace: true });
-          }, 2000);
-        });
-    };
-    findRoomStatus(axios, roomIdParam as string, nav);
+    if (!roomIdParam) {
+      return;
+    } else {
+      const findRoomStatus: (
+        axios: AxiosStatic,
+        room: string,
+        nav: NavigateFunction
+      ) => void = async (axios, room, nav) => {
+        await axios
+          .get(`${FINDROOM}`, { params: { key: room } })
+          .then((response) => {
+            dispatch(roomActions.setRoomName(response.data.roomName));
+            nav(`?roomId=${roomIdParam}&result=${response.data.message}`, {
+              replace: true,
+            });
+          })
+          .catch(() => {
+            nav(`?roomId=${roomIdParam}&result=error`, {
+              replace: true,
+            });
+            setTimeout(() => {
+              nav(REDIRECT, { replace: true });
+            }, 3000);
+          });
+      };
+      findRoomStatus(axios, roomIdParam as string, nav);
+    }
   }, [dispatch, nav, roomIdParam]);
   const submitHandler: (e: FormEvent<HTMLFormElement>) => void = (e) => {
     e.preventDefault();
@@ -69,15 +79,16 @@ const Search: FC<{
     <Grid className={classes.mainContainer} container>
       <Card className={!isMobile ? classes.card : classes.mobCard}>
         <div className={classes.cardHeader}>
-          {roomIdParam && (
+          {resultParam && resultParam === "found" && (
             <Typography variant="h6">Please enter a username</Typography>
           )}
-          {resultParam && (
-            <Typography variant="h6">Welcome to Hangout!</Typography>
-          )}
+          {!resultParam ||
+            (resultParam === "error" && (
+              <Typography variant="h6">Welcome to Hangout!</Typography>
+            ))}
         </div>
         <CardContent>
-          {roomIdParam && (
+          {roomIdParam && !resultParam && (
             <Box>
               <CircularProgress
                 sx={{
@@ -91,7 +102,7 @@ const Search: FC<{
               />
             </Box>
           )}
-          {resultParam && resultParam === "true" && (
+          {resultParam && resultParam === "found" && (
             <UserJoinForm
               isMobile={isMobile}
               classes={classes}
@@ -101,10 +112,10 @@ const Search: FC<{
               submit={submitHandler}
             />
           )}
-          {resultParam && resultParam === "false" && (
+          {resultParam && resultParam === "error" && (
             <Grid className={classes.error} container>
               <Typography sx={{ margin: "auto" }} variant="h5">
-                Room was not found!
+                Room either does not exist or is full.
               </Typography>
             </Grid>
           )}
