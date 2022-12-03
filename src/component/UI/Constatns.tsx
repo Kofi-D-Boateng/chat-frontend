@@ -12,7 +12,7 @@ const SEARCH: string = "/search";
 const SETUPROOM: string = "/create-room/";
 
 // EXTERNAL ROUTES
-const SOCKETURI: string = process.env.REACT_APP_SOCKET_URI || "/";
+const SOCKETURI: string = "http://backend:7000/";
 const API_VERSION: string = process.env.REACT_APP_API_VERSION || "api/v1";
 const FETCHLOGIN: string = `/${API_VERSION}/login/authenticate-user`;
 const FINDROOM: string = `/${API_VERSION}/rooms/find-room`;
