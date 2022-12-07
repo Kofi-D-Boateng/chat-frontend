@@ -14,7 +14,7 @@ import {
 } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
-import { SOCKETURI } from "../component/UI/Constatns";
+import { DOMAIN, PATH } from "../component/UI/Constatns";
 
 import Video from "../component/room/screen/Video";
 import Options from "../component/room/options/Options";
@@ -43,7 +43,7 @@ const Room: FC<{
   const positionRef = useRef<number>(0);
 
   useEffect(() => {
-    socket.current = connect(SOCKETURI);
+    socket.current = connect(DOMAIN, { path: PATH });
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((stream) => {
