@@ -1,66 +1,25 @@
 import { Button, Grid, TextField, Typography } from "@mui/material";
-import { FC, FocusEvent, KeyboardEvent, useRef, useState } from "react";
-import { MessageData, Messages } from "../../../types/types";
+import { FC, useRef, useState } from "react";
+import { Message, MessageData } from "../../../types/types";
 import classes from "../../../styles/ChatStyles.module.css";
-import Message from "./messages/Message";
+import Messages from "./messages/Messages";
 import { characterLimit } from "../../UI/Constatns";
-import { regex, spaceRegEx } from "../../UI/RegExp";
+import {
+  inputView,
+  limitHandler,
+  sendHandler,
+} from "../functions/room-functions";
 
 const ChatBox: FC<{
   isMobile: boolean;
   MyID: string | null;
-  msgs: Messages[];
+  msgs: Message[];
   hideText: boolean;
   onSend: (data: MessageData) => void;
 }> = ({ MyID, hideText, isMobile, msgs, onSend }) => {
   const [limit, setLimit] = useState<number>(characterLimit);
   const [showLabel, setShowLabel] = useState(false);
   const chatRef = useRef<HTMLInputElement>();
-  const inputView: (event: FocusEvent<HTMLInputElement>) => void = (event) => {
-    const { type } = event;
-    if (type === "focus") {
-      setShowLabel(true);
-      return;
-    }
-    if (type === "blur") {
-      setShowLabel(false);
-    }
-  };
-
-  const limitHandler: (event: KeyboardEvent<HTMLDivElement>) => void = (
-    event
-  ) => {
-    const { key } = event;
-    const { code } = event;
-    const char = regex.test(key);
-    const spacebar = spaceRegEx.test(code);
-    setShowLabel(true);
-    if (key === "Backspace" && limit < characterLimit) {
-      setLimit(limit + 1);
-      return;
-    }
-    if (char || spacebar) {
-      if (key !== "Backspace" && limit !== 0) {
-        setLimit(limit - 1);
-      }
-      return;
-    }
-  };
-
-  const sendHandler: () => void = () => {
-    const text = chatRef.current?.value as string;
-    if (limit <= 0 || limit === characterLimit || text.trim().length === 0) {
-      return;
-    }
-
-    onSend({
-      id: MyID as string,
-      message: text,
-    });
-    setShowLabel(false);
-    setLimit(characterLimit);
-    chatRef.current!.value = "";
-  };
 
   return (
     <>
@@ -70,21 +29,19 @@ const ChatBox: FC<{
             <Typography variant="body1">STREAM CHAT</Typography>
           </Grid>
           <Grid className={classes.chat} xs={12} md={12} item>
-            {msgs.map((map, index) => {
-              return (
-                <Message
-                  key={index}
-                  classes={classes}
-                  sender={map.sender}
-                  id={map.id}
-                  myID={MyID as string}
-                  time={map.timestamp}
-                  message={map.message}
-                  Grid={Grid}
-                  Typography={Typography}
-                />
-              );
-            })}
+            {msgs.map((map, index) => (
+              <Messages
+                key={index}
+                classes={classes}
+                sender={map.sender}
+                id={map.id}
+                myID={MyID as string}
+                time={map.timestamp}
+                message={map.message}
+                Grid={Grid}
+                Typography={Typography}
+              />
+            ))}
           </Grid>
           <Grid className={classes.chatBar} xs={12} md={12} item>
             <Grid container>
@@ -93,9 +50,9 @@ const ChatBox: FC<{
                   variant="filled"
                   label={showLabel && `${limit}/${characterLimit}`}
                   className={classes.textField}
-                  onKeyDown={limitHandler}
-                  onFocus={inputView}
-                  onBlur={inputView}
+                  onKeyDown={(e) => limitHandler(e, setShowLabel, setLimit)}
+                  onFocus={(e) => inputView(e, setShowLabel)}
+                  onBlur={(e) => inputView(e, setShowLabel)}
                   inputRef={chatRef}
                   size="small"
                   margin="none"
@@ -112,7 +69,16 @@ const ChatBox: FC<{
                   type="button"
                   variant="outlined"
                   size="small"
-                  onClick={sendHandler}
+                  onClick={() =>
+                    sendHandler(
+                      chatRef,
+                      MyID as string,
+                      limit,
+                      onSend,
+                      setShowLabel,
+                      setLimit
+                    )
+                  }
                   fullWidth
                 >
                   Send

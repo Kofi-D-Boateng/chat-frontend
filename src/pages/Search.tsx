@@ -46,7 +46,7 @@ const Search: FC<{
         nav: NavigateFunction
       ) => void = async (axios, room, nav) => {
         await axios
-          .get(`${FINDROOM}`, { params: { key: room } })
+          .get(`http://localhost:7210${FINDROOM}`, { params: { key: room } })
           .then((response) => {
             dispatch(roomActions.setRoomName(response.data.roomName));
             nav(`?roomId=${roomIdParam}&result=${response.data.message}`, {
@@ -69,10 +69,10 @@ const Search: FC<{
     e.preventDefault();
     dispatch(
       userActions.setUser({
-        roomId: roomIdParam,
         username: usernameRef.current?.value as string,
       })
     );
+    dispatch(roomActions.setRoomId(roomIdParam as string));
     nav(`${URL}/${roomName}`, { replace: true });
   };
   return (

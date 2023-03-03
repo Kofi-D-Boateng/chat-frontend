@@ -7,10 +7,11 @@ import Peer from "simple-peer";
 import { RootState } from "../store/store";
 import { userActions } from "../store/user/user-slice";
 import {
+  Message,
   MessageData,
   MessageDatagram,
-  Messages,
   Participant,
+  User,
 } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
@@ -30,17 +31,21 @@ const Room: FC<{
   isMobile: boolean;
   param: URLSearchParams;
 }> = ({ isMobile }) => {
-  const myInfo = useSelector((state: RootState) => state.user);
+  const stateObj = useSelector((state: RootState) => {
+    return {
+      user: state.user,
+      room: state.room,
+    };
+  });
   const dispatch = useDispatch();
   const nav = useNavigate();
   const [view, setView] = useState<boolean>(false);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Participant[]>([]);
-  const [messages, setMessages] = useState<Messages[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const socket = useRef<Socket>();
   const userVideo: ForwardedRef<any> = useRef();
   const peersRef = useRef<{ peerID: string; instance: Peer.Instance }[]>([]);
-  const positionRef = useRef<number>(0);
 
   useEffect(() => {
     socket.current = connect(DOMAIN, { path: PATH });
@@ -50,8 +55,8 @@ const Room: FC<{
         userVideo.current.srcObject = stream;
 
         socket.current?.emit("join-room", {
-          roomId: myInfo.roomId,
-          username: myInfo.username as string,
+          roomId: stateObj.room.roomId,
+          username: stateObj.user.username as string,
         });
         socket.current?.on("room-status", (data) => {
           if (data.msg.contains("full") || data.msg.contains("error")) {
@@ -59,34 +64,29 @@ const Room: FC<{
             return;
           }
         });
-        socket.current?.on(
-          "all-users",
-          (data: {
-            users: { id: string; position: number; username: string }[];
-            position: number;
-          }) => {
-            const { users, position } = data;
-            if (!positionRef.current) positionRef.current = position;
-            const peers: Participant[] = [];
-            users.map((user) => {
-              const peer = createPeer({
-                userToSignal: user.id,
-                myID: socket.current?.id as string,
-                stream: stream,
-                roomId: myInfo.roomId as string,
-                socket: socket,
-              });
-              peersRef.current.push({ peerID: user.id, instance: peer });
-              peers.push({
-                alias: user.username as string,
-                id: user.id as string,
-                instance: peer,
-              });
-              return true;
+        socket.current?.on("all-users", (data: User[]) => {
+          const peers: Participant[] = [];
+          data.map((user) => {
+            const peer = createPeer({
+              userToSignal: user.id as string,
+              myID: socket.current?.id as string,
+              stream: stream,
+              roomId: stateObj.room.roomId as string,
+              socket: socket,
             });
-            setPeers(peers);
-          }
-        );
+            peersRef.current.push({
+              peerID: user.id as string,
+              instance: peer,
+            });
+            peers.push({
+              alias: user.username as string,
+              id: user.id as string,
+              instance: peer,
+            });
+            return true;
+          });
+          setPeers(peers);
+        });
 
         socket.current?.on(
           "user-joined",
@@ -128,55 +128,30 @@ const Room: FC<{
           item?.instance.signal(data.signal);
         });
 
-        socket.current?.on(
-          "chat",
-          async (data: { message: string; id: string; sender: string }) => {
-            const { message, id, sender } = data;
-            const timestamp = new Date().toLocaleTimeString();
-            const messageObject: Messages = {
-              id: id,
-              message,
-              sender: sender,
-              timestamp,
-            };
-            setMessages((prev) => [...prev, messageObject]);
-          }
-        );
+        socket.current?.on("chat", async (data: Message) => {
+          setMessages((prev) => [...prev, data]);
+        });
 
-        socket.current?.on(
-          "users-left",
-          async (data: {
-            leaver: string;
-            updatedList: {
-              id: string;
-              position: number;
-              username: string;
-            }[];
-          }) => {
-            const { leaver, updatedList } = data;
-            const newPosition = updatedList.find((p) => {
-              return p.id === socket.current?.id;
-            })?.position;
-            positionRef.current = newPosition!;
-            const REMAINERS = _LEAVE({
-              leaver: leaver,
-              peersRef: peersRef,
-            });
-            if (REMAINERS.length === 0) {
-              peersRef.current = [];
-              setPeers([]);
-            } else {
-              setPeers((prev) => {
-                const updatedPress = prev.filter((p) => {
-                  return p.id !== leaver;
-                });
-                return updatedPress;
+        socket.current?.on("users-left", async (data: { leaver: string }) => {
+          const { leaver } = data;
+          const REMAINERS = _LEAVE({
+            leaver: leaver,
+            peersRef: peersRef,
+          });
+          if (REMAINERS.length === 0) {
+            peersRef.current = [];
+            setPeers([]);
+          } else {
+            setPeers((prev) => {
+              const updatedPress = prev.filter((p) => {
+                return p.id !== leaver;
               });
-            }
+              return updatedPress;
+            });
           }
-        );
+        });
       });
-  }, [myInfo, dispatch]);
+  }, [stateObj.room.roomId, stateObj.user.username, dispatch]);
 
   const videoHandler = () => {
     const src: MediaStream = userVideo.current.srcObject;
@@ -203,7 +178,7 @@ const Room: FC<{
   };
 
   const linkHandler = () => {
-    navigator.clipboard.writeText(myInfo.roomId as string).then(() => {
+    navigator.clipboard.writeText(stateObj.room.roomId as string).then(() => {
       setView(true);
       setTimeout(() => {
         setView(false);
@@ -214,11 +189,10 @@ const Room: FC<{
   const chatHandler = async (data: MessageData) => {
     const { message, id } = data;
     const messageDatagram: MessageDatagram = {
-      room: myInfo.roomId as string,
+      room: stateObj.room.roomId as string,
       user: {
         id: id,
-        username: myInfo.username as string,
-        position: positionRef.current as number,
+        username: stateObj.user.username as string,
         message: message,
       },
     };
@@ -243,11 +217,10 @@ const Room: FC<{
     const src: MediaStream = userVideo.current.srcObject;
     src.getTracks().forEach((track) => track.stop());
     socket.current?.emit("leave", {
-      room: myInfo.roomId,
+      room: stateObj.room.roomId,
       user: {
-        position: positionRef.current,
         id: socket.current.id,
-        username: myInfo.username,
+        username: stateObj.user.username,
       },
     });
     nav("/", { replace: true });
@@ -267,7 +240,7 @@ const Room: FC<{
             <Paper className={classes.paper} sx={{ backgroundColor: "black" }}>
               <Grid xs={12} md={12} item>
                 <Typography variant="h5" className={classes.name} gutterBottom>
-                  {myInfo.username}
+                  {stateObj.user.username}
                 </Typography>
                 <Grid className={classes.disabled} xs={12} md={12} item />
                 <video

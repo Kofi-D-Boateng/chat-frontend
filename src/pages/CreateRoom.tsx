@@ -15,6 +15,7 @@ import { userActions } from "../store/user/user-slice";
 import classes from "../../src/styles/CreateRoomStyles.module.css";
 import { Room } from "../types/types";
 import { useDispatch } from "react-redux";
+import { roomActions } from "../store/room/room-slice";
 
 const CreateRoom: FC<{
   isMobile: boolean;
@@ -40,20 +41,25 @@ const CreateRoom: FC<{
       name: roomNameRef.current?.value as string,
       creator: usernameRef.current?.value as string,
       capacity: numberCheck,
+      roomId: "",
     });
   };
 
   const setRoom: (data: Room) => void = async (data) => {
-    const result = await axios.post(`${CREATEROOM}`, data);
+    console.log(data);
+    const result = await axios.post(`http://localhost:7210${CREATEROOM}`, data);
     if (result.status < 200 || result.status > 204) return;
     const { roomID } = result.data;
+    data.roomId = roomID;
     dispatch(
       userActions.setUser({
         username: usernameRef.current?.value as string,
-        roomId: roomID,
       })
     );
-    nav(`${URL}/${roomNameRef.current?.value}`, { replace: true });
+    dispatch(roomActions.setRoom(data));
+    nav(`${URL}/${roomNameRef.current?.value}`, {
+      replace: true,
+    });
   };
 
   return (

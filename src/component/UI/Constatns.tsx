@@ -12,7 +12,7 @@ const SEARCH: string = "/search";
 const SETUPROOM: string = "/create-room/";
 
 // EXTERNAL ROUTES
-const DOMAIN: string = "https://hangoutarea.com";
+const DOMAIN: string = "http://localhost:7210";
 const PATH: string = "/chat-socket";
 const API_VERSION: string = process.env.REACT_APP_API_VERSION || "api/v1";
 const FETCHLOGIN: string = `/${API_VERSION}/login/authenticate-user`;

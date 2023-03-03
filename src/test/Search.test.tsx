@@ -22,7 +22,8 @@ const theme = createTheme({
 });
 
 const USER: User = {
-  roomId: "",
+  id: "",
+  messages: new Set(),
   username: "",
 };
 
