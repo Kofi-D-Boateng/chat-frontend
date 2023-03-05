@@ -1,0 +1,15 @@
+export enum SocketNamespace {
+  JOINROOM = "join-room",
+  ROOMSTATUS = "room-status",
+  USERID = "myID",
+  GETUSERSINROOM = "all-users",
+  USERJOINED = "user-joined",
+  RECEIVEDSIGNAL = "received-signal",
+  CHAT = "chat",
+  USERSLEFTINROOM = "users-left",
+  SIGNAL = "signal",
+  SENDINGSIGNAL = "sending-signal",
+  RETURNINGSIGNAL = "returning-signal",
+  MESSAGES = "message",
+  LEAVE = "leave",
+}

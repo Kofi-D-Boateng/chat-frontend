@@ -12,14 +12,10 @@ import {
   MessageData,
 } from "../../../types/types";
 import Peer from "simple-peer";
-import {
-  characterLimit,
-  RETURNINGSIGNAL,
-  SENDINGSIGNAL,
-  SIGNAL,
-} from "../../UI/Constatns";
+import { characterLimit } from "../../UI/Constatns";
 import { videoActions } from "../../../store/video/video-slice";
 import { regex, spaceRegEx } from "../../UI/RegExp";
+import { SocketNamespace } from "../../../enums/namespaces";
 
 export const _LEAVE = (data: leaveData) => {
   const updatedRef = data.peersRef.current.filter((p) => {
@@ -37,11 +33,11 @@ export const createPeer = (data: createPeerData) => {
     stream: data.stream,
   });
 
-  peer.on(SIGNAL, (signal) => {
-    data.socket.current?.emit(SENDINGSIGNAL, {
+  peer.on(SocketNamespace.SIGNAL, (signal) => {
+    data.socket.current?.emit(SocketNamespace.SENDINGSIGNAL, {
       userToSignal: data.userToSignal,
-      callerID: data.myID,
-      roomID: data.roomId,
+      callerId: data.myID,
+      roomId: data.roomId,
       signal,
     });
   });
@@ -56,10 +52,10 @@ export const addPeer = (data: addPeerData) => {
     stream: data.stream,
   });
 
-  peer.on(SIGNAL, (signal) => {
-    data.socket.current?.emit(RETURNINGSIGNAL, {
+  peer.on(SocketNamespace.SIGNAL, (signal) => {
+    data.socket.current?.emit(SocketNamespace.RETURNINGSIGNAL, {
       signal: signal,
-      callerID: data.callerID,
+      callerId: data.callerId,
     });
   });
   peer.signal(data.signal);

@@ -23,7 +23,7 @@ const theme = createTheme({
 
 const USER: User = {
   id: "",
-  messages: new Set(),
+  messages: [],
   username: "",
 };
 

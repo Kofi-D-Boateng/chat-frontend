@@ -26,6 +26,7 @@ import {
   _LEAVE,
 } from "../component/room/functions/room-functions";
 import LinkCopyMessage from "../component/UI/Modal/LinkCopyMessage";
+import { SocketNamespace } from "../enums/namespaces";
 
 const Room: FC<{
   isMobile: boolean;
@@ -54,17 +55,23 @@ const Room: FC<{
       .then((stream) => {
         userVideo.current.srcObject = stream;
 
-        socket.current?.emit("join-room", {
-          roomId: stateObj.room.roomId,
+        socket.current?.emit(SocketNamespace.JOINROOM, {
+          roomId: sessionStorage.getItem("roomId"),
           username: stateObj.user.username as string,
         });
-        socket.current?.on("room-status", (data) => {
-          if (data.msg.contains("full") || data.msg.contains("error")) {
-            dispatch(userActions.clearUser());
-            return;
+        socket.current?.on(
+          SocketNamespace.ROOMSTATUS,
+          (data: { msg: string }) => {
+            if (data.msg.startsWith("full") || data.msg.startsWith("error")) {
+              dispatch(userActions.clearUser());
+              const src: MediaStream = userVideo.current?.srcObject;
+              src.getTracks().forEach((track) => track.stop());
+              nav("/", { replace: true });
+            }
           }
-        });
-        socket.current?.on("all-users", (data: User[]) => {
+        );
+        socket.current?.on(SocketNamespace.GETUSERSINROOM, (data: User[]) => {
+          console.log(data);
           const peers: Participant[] = [];
           data.map((user) => {
             const peer = createPeer({
@@ -89,28 +96,25 @@ const Room: FC<{
         });
 
         socket.current?.on(
-          "user-joined",
+          SocketNamespace.USERJOINED,
           (data: {
             signal: any;
-            callerID: string;
-            updatedUserList: {
-              id: string;
-              position: number;
-              username: string;
-            }[];
+            callerId: string;
+            updatedUserList: User[];
           }) => {
+            console.log(data);
             const peer = addPeer({
               signal: data.signal,
-              callerID: data.callerID,
+              callerId: data.callerId,
               stream: stream,
               socket: socket,
             });
             peersRef.current.push({
-              peerID: data.callerID,
+              peerID: data.callerId,
               instance: peer,
             });
             const addedUser = data.updatedUserList.find((p) => {
-              return p.id === data.callerID;
+              return p.id === data.callerId;
             });
             const user: Participant = {
               alias: addedUser?.username as string,
@@ -121,37 +125,44 @@ const Room: FC<{
           }
         );
 
-        socket.current?.on("receiving-signal", (data) => {
-          var item = peersRef.current.find((p) => {
-            return p.peerID === data.id;
-          });
-          item?.instance.signal(data.signal);
-        });
+        socket.current?.on(
+          SocketNamespace.RECEIVEDSIGNAL,
+          (data: { id: string; signal: string | Peer.SignalData }) => {
+            console.log(data);
+            var item = peersRef.current.find((p) => {
+              return p.peerID === data.id;
+            });
+            item?.instance.signal(data.signal);
+          }
+        );
 
-        socket.current?.on("chat", async (data: Message) => {
+        socket.current?.on(SocketNamespace.CHAT, async (data: Message) => {
           setMessages((prev) => [...prev, data]);
         });
 
-        socket.current?.on("users-left", async (data: { leaver: string }) => {
-          const { leaver } = data;
-          const REMAINERS = _LEAVE({
-            leaver: leaver,
-            peersRef: peersRef,
-          });
-          if (REMAINERS.length === 0) {
-            peersRef.current = [];
-            setPeers([]);
-          } else {
-            setPeers((prev) => {
-              const updatedPress = prev.filter((p) => {
-                return p.id !== leaver;
-              });
-              return updatedPress;
+        socket.current?.on(
+          SocketNamespace.USERSLEFTINROOM,
+          async (data: { leaver: string }) => {
+            const { leaver } = data;
+            const REMAINERS = _LEAVE({
+              leaver: leaver,
+              peersRef: peersRef,
             });
+            if (REMAINERS.length === 0) {
+              peersRef.current = [];
+              setPeers([]);
+            } else {
+              setPeers((prev) => {
+                const updatedPress = prev.filter((p) => {
+                  return p.id !== leaver;
+                });
+                return updatedPress;
+              });
+            }
           }
-        });
+        );
       });
-  }, [stateObj.room.roomId, stateObj.user.username, dispatch]);
+  }, [stateObj.room.roomId, stateObj.user.username, dispatch, nav]);
 
   const videoHandler = () => {
     const src: MediaStream = userVideo.current.srcObject;
@@ -197,7 +208,7 @@ const Room: FC<{
       },
     };
     if (messageDatagram.user.message !== null) {
-      socket.current?.emit("message", messageDatagram);
+      socket.current?.emit(SocketNamespace.MESSAGES, messageDatagram);
     }
   };
 
@@ -216,7 +227,7 @@ const Room: FC<{
     dispatch(userActions.clearUser());
     const src: MediaStream = userVideo.current.srcObject;
     src.getTracks().forEach((track) => track.stop());
-    socket.current?.emit("leave", {
+    socket.current?.emit(SocketNamespace.LEAVE, {
       room: stateObj.room.roomId,
       user: {
         id: socket.current.id,

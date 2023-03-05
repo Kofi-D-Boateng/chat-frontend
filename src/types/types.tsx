@@ -5,7 +5,7 @@ import { Socket } from "socket.io-client";
 export type User = {
   id: string | null;
   username: string | null;
-  messages: Set<Message>;
+  messages: Message[];
 };
 
 export type Video = {
@@ -61,7 +61,7 @@ export type MessageDatagram = {
 export type addPeerData = {
   signal: Peer.SignalData;
   stream: MediaStream;
-  callerID: string;
+  callerId: string;
   socket: MutableRefObject<Socket | undefined>;
 };
 

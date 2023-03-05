@@ -16,6 +16,7 @@ const roomSlice = createSlice({
   initialState: initialState(),
   reducers: {
     setRoom(state, action: PayloadAction<Room>) {
+      console.log(action.payload);
       state.name = action.payload.name;
       state.creator = action.payload.creator;
       state.capacity = action.payload.capacity;
@@ -28,6 +29,7 @@ const roomSlice = createSlice({
     },
     setRoomId(state, action: PayloadAction<string>) {
       state.roomId = action.payload;
+      sessionStorage.setItem("roomId", action.payload);
     },
   },
 });

@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Message, User } from "../../types/types";
+import { User } from "../../types/types";
 
 function initialState(): User {
   const username: string | null = sessionStorage.getItem("usernamne");
   return {
     id: "",
     username: username,
-    messages: new Set<Message>(),
+    messages: [],
   };
 }
 
