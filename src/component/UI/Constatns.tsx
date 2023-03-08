@@ -12,7 +12,7 @@ const SEARCH: string = "/search";
 const SETUPROOM: string = "/create-room/";
 
 // EXTERNAL ROUTES
-const DOMAIN: string = "https://hangoutarea.com";
+const DOMAIN: string = "http://localhost:7210";
 const PATH: string = "/chat-socket";
 const API_VERSION: string = process.env.REACT_APP_API_VERSION || "api/v1";
 const FETCHLOGIN: string = `/${API_VERSION}/login/authenticate-user`;
@@ -21,21 +21,6 @@ const CREATEROOM: string = `/${API_VERSION}/rooms/create-room`;
 
 // MESSAGE LENGTHS
 const characterLimit: number = 250;
-
-// SOCKET LITERALS
-const JOINROOM: string = "join-room";
-const ROOMSTATUS: string = "room-status";
-const USERID: string = "myID";
-const GETUSERSINROOM: string = "all-users";
-const USERJOINED: string = "user-joined";
-const RECEIVESIGNAL: string = "receiving-signal";
-const CHAT: string = "chat";
-const USERSLEFTINROOM: string = "users-left";
-const SIGNAL: string = "signal";
-const SENDINGSIGNAL: string = "sending-signal";
-const RETURNINGSIGNAL: string = "returning-signal";
-const MESSAGES: string = "message";
-const LEAVE: string = "leave";
 
 export {
   modalDiv,
@@ -52,18 +37,5 @@ export {
   CREATEROOM,
   DOMAIN,
   LOGGEDIN,
-  JOINROOM,
-  ROOMSTATUS,
-  USERID,
-  GETUSERSINROOM,
-  USERJOINED,
-  RECEIVESIGNAL,
-  CHAT,
-  USERSLEFTINROOM,
-  LEAVE,
-  MESSAGES,
-  RETURNINGSIGNAL,
-  SIGNAL,
-  SENDINGSIGNAL,
   PATH,
 };

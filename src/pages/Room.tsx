@@ -6,12 +6,7 @@ import { connect, Socket } from "socket.io-client";
 import Peer from "simple-peer";
 import { RootState } from "../store/store";
 import { userActions } from "../store/user/user-slice";
-import {
-  MessageData,
-  MessageDatagram,
-  Messages,
-  Participant,
-} from "../types/types";
+import { Message, Participant, User } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
 import { DOMAIN, PATH } from "../component/UI/Constatns";
@@ -25,22 +20,27 @@ import {
   _LEAVE,
 } from "../component/room/functions/room-functions";
 import LinkCopyMessage from "../component/UI/Modal/LinkCopyMessage";
+import { SocketNamespace } from "../enums/namespaces";
 
 const Room: FC<{
   isMobile: boolean;
   param: URLSearchParams;
 }> = ({ isMobile }) => {
-  const myInfo = useSelector((state: RootState) => state.user);
+  const stateObj = useSelector((state: RootState) => {
+    return {
+      user: state.user,
+      room: state.room,
+    };
+  });
   const dispatch = useDispatch();
   const nav = useNavigate();
   const [view, setView] = useState<boolean>(false);
   const [hideText, setHideText] = useState(false);
   const [peers, setPeers] = useState<Participant[]>([]);
-  const [messages, setMessages] = useState<Messages[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const socket = useRef<Socket>();
   const userVideo: ForwardedRef<any> = useRef();
   const peersRef = useRef<{ peerID: string; instance: Peer.Instance }[]>([]);
-  const positionRef = useRef<number>(0);
 
   useEffect(() => {
     socket.current = connect(DOMAIN, { path: PATH });
@@ -49,69 +49,66 @@ const Room: FC<{
       .then((stream) => {
         userVideo.current.srcObject = stream;
 
-        socket.current?.emit("join-room", {
-          roomId: myInfo.roomId,
-          username: myInfo.username as string,
-        });
-        socket.current?.on("room-status", (data) => {
-          if (data.msg.contains("full") || data.msg.contains("error")) {
-            dispatch(userActions.clearUser());
-            return;
-          }
+        socket.current?.emit(SocketNamespace.JOINROOM, {
+          roomId: sessionStorage.getItem("roomId"),
+          username: stateObj.user.username as string,
         });
         socket.current?.on(
-          "all-users",
-          (data: {
-            users: { id: string; position: number; username: string }[];
-            position: number;
-          }) => {
-            const { users, position } = data;
-            if (!positionRef.current) positionRef.current = position;
-            const peers: Participant[] = [];
-            users.map((user) => {
-              const peer = createPeer({
-                userToSignal: user.id,
-                myID: socket.current?.id as string,
-                stream: stream,
-                roomId: myInfo.roomId as string,
-                socket: socket,
-              });
-              peersRef.current.push({ peerID: user.id, instance: peer });
-              peers.push({
-                alias: user.username as string,
-                id: user.id as string,
-                instance: peer,
-              });
-              return true;
-            });
-            setPeers(peers);
+          SocketNamespace.ROOMSTATUS,
+          (data: { msg: string }) => {
+            if (data.msg.startsWith("full") || data.msg.startsWith("error")) {
+              dispatch(userActions.clearUser());
+              const src: MediaStream = userVideo.current.srcObject;
+              src?.getTracks().forEach((track) => track.stop());
+              nav("/", { replace: true });
+            }
           }
         );
+        socket.current?.on(SocketNamespace.GETUSERSINROOM, (data: User[]) => {
+          const peers: Participant[] = [];
+          data.map((user) => {
+            const peer = createPeer({
+              userToSignal: user.id as string,
+              myID: socket.current?.id as string,
+              stream: stream,
+              roomId: stateObj.room.roomId as string,
+              socket: socket,
+            });
+            peersRef.current.push({
+              peerID: user.id as string,
+              instance: peer,
+            });
+            peers.push({
+              alias: user.username as string,
+              id: user.id as string,
+              instance: peer,
+            });
+            return true;
+          });
+          setPeers(peers);
+        });
 
         socket.current?.on(
-          "user-joined",
+          SocketNamespace.USERJOINED,
           (data: {
             signal: any;
-            callerID: string;
-            updatedUserList: {
-              id: string;
-              position: number;
-              username: string;
-            }[];
+            callerId: string;
+            updatedUserList: User[];
           }) => {
             const peer = addPeer({
               signal: data.signal,
-              callerID: data.callerID,
+              callerId: data.callerId,
               stream: stream,
               socket: socket,
             });
             peersRef.current.push({
-              peerID: data.callerID,
+              peerID: data.callerId,
               instance: peer,
             });
             const addedUser = data.updatedUserList.find((p) => {
-              return p.id === data.callerID;
+              return p.id === data.callerId;
             });
+            console.log(addedUser);
             const user: Participant = {
               alias: addedUser?.username as string,
               id: addedUser?.id as string,
@@ -121,43 +118,25 @@ const Room: FC<{
           }
         );
 
-        socket.current?.on("receiving-signal", (data) => {
-          var item = peersRef.current.find((p) => {
-            return p.peerID === data.id;
-          });
-          item?.instance.signal(data.signal);
-        });
-
         socket.current?.on(
-          "chat",
-          async (data: { message: string; id: string; sender: string }) => {
-            const { message, id, sender } = data;
-            const timestamp = new Date().toLocaleTimeString();
-            const messageObject: Messages = {
-              id: id,
-              message,
-              sender: sender,
-              timestamp,
-            };
-            setMessages((prev) => [...prev, messageObject]);
+          SocketNamespace.RECEIVEDSIGNAL,
+          (data: { id: string; signal: Peer.SignalData }) => {
+            var item = peersRef.current.find((p) => {
+              return p.peerID === data.id;
+            });
+            item?.instance.signal(data.signal);
           }
         );
 
+        socket.current?.on(SocketNamespace.CHAT, async (data: Message) => {
+          console.log(data);
+          setMessages((prev) => [...prev, data]);
+        });
+
         socket.current?.on(
-          "users-left",
-          async (data: {
-            leaver: string;
-            updatedList: {
-              id: string;
-              position: number;
-              username: string;
-            }[];
-          }) => {
-            const { leaver, updatedList } = data;
-            const newPosition = updatedList.find((p) => {
-              return p.id === socket.current?.id;
-            })?.position;
-            positionRef.current = newPosition!;
+          SocketNamespace.USERSLEFTINROOM,
+          async (data: { leaver: string }) => {
+            const { leaver } = data;
             const REMAINERS = _LEAVE({
               leaver: leaver,
               peersRef: peersRef,
@@ -176,7 +155,7 @@ const Room: FC<{
           }
         );
       });
-  }, [myInfo, dispatch]);
+  }, [stateObj.room.roomId, stateObj.user.username, dispatch, nav]);
 
   const videoHandler = () => {
     const src: MediaStream = userVideo.current.srcObject;
@@ -203,28 +182,14 @@ const Room: FC<{
   };
 
   const linkHandler = () => {
-    navigator.clipboard.writeText(myInfo.roomId as string).then(() => {
-      setView(true);
-      setTimeout(() => {
-        setView(false);
-      }, 3000);
-    });
-  };
-
-  const chatHandler = async (data: MessageData) => {
-    const { message, id } = data;
-    const messageDatagram: MessageDatagram = {
-      room: myInfo.roomId as string,
-      user: {
-        id: id,
-        username: myInfo.username as string,
-        position: positionRef.current as number,
-        message: message,
-      },
-    };
-    if (messageDatagram.user.message !== null) {
-      socket.current?.emit("message", messageDatagram);
-    }
+    navigator.clipboard
+      .writeText(sessionStorage.getItem("roomId") as string)
+      .then(() => {
+        setView(true);
+        setTimeout(() => {
+          setView(false);
+        }, 3000);
+      });
   };
 
   const viewHandler = async () => {
@@ -239,17 +204,16 @@ const Room: FC<{
   };
 
   const roomExit = () => {
-    dispatch(userActions.clearUser());
     const src: MediaStream = userVideo.current.srcObject;
     src.getTracks().forEach((track) => track.stop());
-    socket.current?.emit("leave", {
-      room: myInfo.roomId,
+    socket.current?.emit(SocketNamespace.LEAVE, {
+      roomId: sessionStorage.getItem("roomId"),
       user: {
-        position: positionRef.current,
         id: socket.current.id,
-        username: myInfo.username,
+        username: stateObj.user.username,
       },
     });
+    dispatch(userActions.clearUser());
     nav("/", { replace: true });
   };
 
@@ -267,7 +231,7 @@ const Room: FC<{
             <Paper className={classes.paper} sx={{ backgroundColor: "black" }}>
               <Grid xs={12} md={12} item>
                 <Typography variant="h5" className={classes.name} gutterBottom>
-                  {myInfo.username}
+                  {stateObj.user.username}
                 </Typography>
                 <Grid className={classes.disabled} xs={12} md={12} item />
                 <video
@@ -280,6 +244,7 @@ const Room: FC<{
               </Grid>
             </Paper>
             {peers.map((peer, index) => {
+              console.log(peer);
               return <Video key={index} classes={classes} peer={peer} />;
             })}
           </Grid>
@@ -300,9 +265,9 @@ const Room: FC<{
         </Grid>
         <Chatbox
           isMobile={isMobile}
-          MyID={socket.current?.id as string}
+          socket={socket.current}
           msgs={messages}
-          onSend={chatHandler}
+          states={stateObj}
           hideText={hideText}
         />
       </Grid>

@@ -69,10 +69,10 @@ const Search: FC<{
     e.preventDefault();
     dispatch(
       userActions.setUser({
-        roomId: roomIdParam,
         username: usernameRef.current?.value as string,
       })
     );
+    dispatch(roomActions.setRoomId(roomIdParam as string));
     nav(`${URL}/${roomName}`, { replace: true });
   };
   return (

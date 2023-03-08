@@ -15,6 +15,7 @@ import { userActions } from "../store/user/user-slice";
 import classes from "../../src/styles/CreateRoomStyles.module.css";
 import { Room } from "../types/types";
 import { useDispatch } from "react-redux";
+import { roomActions } from "../store/room/room-slice";
 
 const CreateRoom: FC<{
   isMobile: boolean;
@@ -40,6 +41,7 @@ const CreateRoom: FC<{
       name: roomNameRef.current?.value as string,
       creator: usernameRef.current?.value as string,
       capacity: numberCheck,
+      roomId: "",
     });
   };
 
@@ -50,10 +52,19 @@ const CreateRoom: FC<{
     dispatch(
       userActions.setUser({
         username: usernameRef.current?.value as string,
+      })
+    );
+    dispatch(
+      roomActions.setRoom({
+        capacity: data.capacity,
+        creator: data.creator,
+        name: data.name,
         roomId: roomID,
       })
     );
-    nav(`${URL}/${roomNameRef.current?.value}`, { replace: true });
+    nav(`${URL}/${roomNameRef.current?.value}`, {
+      replace: true,
+    });
   };
 
   return (
