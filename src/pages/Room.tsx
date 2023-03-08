@@ -6,13 +6,7 @@ import { connect, Socket } from "socket.io-client";
 import Peer from "simple-peer";
 import { RootState } from "../store/store";
 import { userActions } from "../store/user/user-slice";
-import {
-  Message,
-  MessageData,
-  MessageDatagram,
-  Participant,
-  User,
-} from "../types/types";
+import { Message, Participant, User } from "../types/types";
 import classes from "../styles/RoomStyles.module.css";
 import { videoActions } from "../store/video/video-slice";
 import { DOMAIN, PATH } from "../component/UI/Constatns";
@@ -64,14 +58,13 @@ const Room: FC<{
           (data: { msg: string }) => {
             if (data.msg.startsWith("full") || data.msg.startsWith("error")) {
               dispatch(userActions.clearUser());
-              const src: MediaStream = userVideo.current?.srcObject;
-              src.getTracks().forEach((track) => track.stop());
+              const src: MediaStream = userVideo.current.srcObject;
+              src?.getTracks().forEach((track) => track.stop());
               nav("/", { replace: true });
             }
           }
         );
         socket.current?.on(SocketNamespace.GETUSERSINROOM, (data: User[]) => {
-          console.log(data);
           const peers: Participant[] = [];
           data.map((user) => {
             const peer = createPeer({
@@ -102,7 +95,6 @@ const Room: FC<{
             callerId: string;
             updatedUserList: User[];
           }) => {
-            console.log(data);
             const peer = addPeer({
               signal: data.signal,
               callerId: data.callerId,
@@ -116,6 +108,7 @@ const Room: FC<{
             const addedUser = data.updatedUserList.find((p) => {
               return p.id === data.callerId;
             });
+            console.log(addedUser);
             const user: Participant = {
               alias: addedUser?.username as string,
               id: addedUser?.id as string,
@@ -127,8 +120,7 @@ const Room: FC<{
 
         socket.current?.on(
           SocketNamespace.RECEIVEDSIGNAL,
-          (data: { id: string; signal: string | Peer.SignalData }) => {
-            console.log(data);
+          (data: { id: string; signal: Peer.SignalData }) => {
             var item = peersRef.current.find((p) => {
               return p.peerID === data.id;
             });
@@ -137,6 +129,7 @@ const Room: FC<{
         );
 
         socket.current?.on(SocketNamespace.CHAT, async (data: Message) => {
+          console.log(data);
           setMessages((prev) => [...prev, data]);
         });
 
@@ -189,27 +182,14 @@ const Room: FC<{
   };
 
   const linkHandler = () => {
-    navigator.clipboard.writeText(stateObj.room.roomId as string).then(() => {
-      setView(true);
-      setTimeout(() => {
-        setView(false);
-      }, 3000);
-    });
-  };
-
-  const chatHandler = async (data: MessageData) => {
-    const { message, id } = data;
-    const messageDatagram: MessageDatagram = {
-      room: stateObj.room.roomId as string,
-      user: {
-        id: id,
-        username: stateObj.user.username as string,
-        message: message,
-      },
-    };
-    if (messageDatagram.user.message !== null) {
-      socket.current?.emit(SocketNamespace.MESSAGES, messageDatagram);
-    }
+    navigator.clipboard
+      .writeText(sessionStorage.getItem("roomId") as string)
+      .then(() => {
+        setView(true);
+        setTimeout(() => {
+          setView(false);
+        }, 3000);
+      });
   };
 
   const viewHandler = async () => {
@@ -224,16 +204,16 @@ const Room: FC<{
   };
 
   const roomExit = () => {
-    dispatch(userActions.clearUser());
     const src: MediaStream = userVideo.current.srcObject;
     src.getTracks().forEach((track) => track.stop());
     socket.current?.emit(SocketNamespace.LEAVE, {
-      room: stateObj.room.roomId,
+      roomId: sessionStorage.getItem("roomId"),
       user: {
         id: socket.current.id,
         username: stateObj.user.username,
       },
     });
+    dispatch(userActions.clearUser());
     nav("/", { replace: true });
   };
 
@@ -264,6 +244,7 @@ const Room: FC<{
               </Grid>
             </Paper>
             {peers.map((peer, index) => {
+              console.log(peer);
               return <Video key={index} classes={classes} peer={peer} />;
             })}
           </Grid>
@@ -284,9 +265,9 @@ const Room: FC<{
         </Grid>
         <Chatbox
           isMobile={isMobile}
-          MyID={socket.current?.id as string}
+          socket={socket.current}
           msgs={messages}
-          onSend={chatHandler}
+          states={stateObj}
           hideText={hideText}
         />
       </Grid>

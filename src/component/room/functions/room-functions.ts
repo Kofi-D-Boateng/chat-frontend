@@ -9,13 +9,16 @@ import {
   addPeerData,
   createPeerData,
   leaveData,
-  MessageData,
+  MessageDatagram,
+  Room,
+  User,
 } from "../../../types/types";
 import Peer from "simple-peer";
 import { characterLimit } from "../../UI/Constatns";
 import { videoActions } from "../../../store/video/video-slice";
 import { regex, spaceRegEx } from "../../UI/RegExp";
 import { SocketNamespace } from "../../../enums/namespaces";
+import { Socket } from "socket.io-client";
 
 export const _LEAVE = (data: leaveData) => {
   const updatedRef = data.peersRef.current.filter((p) => {
@@ -58,8 +61,8 @@ export const addPeer = (data: addPeerData) => {
       callerId: data.callerId,
     });
   });
+  console.log(data);
   peer.signal(data.signal);
-
   return peer;
 };
 
@@ -110,21 +113,30 @@ export const limitHandler: (
 
 export const sendHandler: (
   chatRef: MutableRefObject<HTMLInputElement | undefined>,
-  id: string,
+  socket: Socket | undefined,
+  states: {
+    user: User;
+    room: Room;
+  },
   limit: number,
-  onSend: (data: MessageData) => void,
   setShowLabel: (value: SetStateAction<boolean>) => void,
   setLimit: (value: SetStateAction<number>) => void
-) => void = (chatRef, id, limit, onSend, setShowLabel, setLimit) => {
+) => void = (chatRef, socket, states, limit, setShowLabel, setLimit) => {
   const text = chatRef.current?.value as string;
   if (limit <= 0 || limit === characterLimit || text.trim().length === 0) {
     return;
   }
 
-  onSend({
-    id: id,
-    message: text,
-  });
+  const messageDatagram: MessageDatagram = {
+    roomId: sessionStorage.getItem("roomId") as string,
+    user: {
+      id: socket?.id as string,
+      username: states.user.username as string,
+      message: text,
+    },
+  };
+
+  socket?.emit(SocketNamespace.MESSAGES, messageDatagram);
   setShowLabel(false);
   setLimit(characterLimit);
   chatRef.current!.value = "";

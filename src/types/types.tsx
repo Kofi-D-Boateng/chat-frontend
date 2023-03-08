@@ -32,8 +32,8 @@ export type UserDatagram = {
 
 export type Message = {
   id: string;
-  message: string;
-  timestamp: number;
+  text: string;
+  createdAt: number;
   sender: string;
 };
 
@@ -50,7 +50,7 @@ export type MessageData = {
 };
 
 export type MessageDatagram = {
-  room: string;
+  roomId: string;
   user: {
     id: string;
     username: string;

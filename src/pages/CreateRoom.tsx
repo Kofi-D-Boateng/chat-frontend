@@ -46,7 +46,7 @@ const CreateRoom: FC<{
   };
 
   const setRoom: (data: Room) => void = async (data) => {
-    const result = await axios.post(`http://localhost:7210${CREATEROOM}`, data);
+    const result = await axios.post(`${CREATEROOM}`, data);
     if (result.status < 200 || result.status > 204) return;
     const { roomID } = result.data;
     dispatch(

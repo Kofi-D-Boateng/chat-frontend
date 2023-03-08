@@ -10,22 +10,22 @@ const Messages: FC<{
   id: string;
   myID: string;
   time: number;
-  message: string;
+  text: string;
   Grid: OverridableComponent<GridTypeMap<{}, "div">>;
   Typography: OverridableComponent<TypographyTypeMap<{}, "span">>;
-}> = ({ classes, id, message, myID, sender, time, Grid, Typography }) => {
+}> = ({ classes, id, text, myID, sender, time, Grid, Typography }) => {
   const check: boolean = id === myID;
   return (
     <Grid className={check ? classes.msg : classes.peerMsg} container>
       <Grid xs={12} md={12} item>
         <Typography variant="h6" className={classes.msgTitle}>
           {check
-            ? `You:${new Date(time).toUTCString()}`
-            : `${sender}:${new Date(time).toUTCString()}`}
+            ? `You: ${new Date(time).toLocaleTimeString()}`
+            : `${sender}: ${new Date(time).toLocaleTimeString()}`}
         </Typography>
       </Grid>
       <Grid xs={12} md={12} item>
-        <Typography variant="h6">{message}</Typography>
+        <Typography variant="h6">{text}</Typography>
       </Grid>
     </Grid>
   );
